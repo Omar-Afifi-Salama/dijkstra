@@ -1,0 +1,254 @@
+---
+// src/pages/[locale]/index.astro
+import GlobalLayout from "../../layouts/GlobalLayout.astro";
+import { supportedLocales, useTranslations } from "../../i18n/utils";
+
+export function getStaticPaths() {
+    return supportedLocales.map((locale) => ({ params: { locale } }));
+}
+
+const { locale } = Astro.params;
+const { t } = useTranslations(locale);
+
+const features = [
+    {
+        tag: t("landing.features.roadmaps.tag"),
+        title: t("landing.features.roadmaps.title"),
+        desc: t("landing.features.roadmaps.desc"),
+    },
+    {
+        tag: t("landing.features.localFirst.tag"),
+        title: t("landing.features.localFirst.title"),
+        desc: t("landing.features.localFirst.desc"),
+    },
+    {
+        tag: t("landing.features.bilingual.tag"),
+        title: t("landing.features.bilingual.title"),
+        desc: t("landing.features.bilingual.desc"),
+    },
+];
+---
+
+<GlobalLayout
+    title={`dijkstra | ${t("landing.title")}`}
+    locale={locale}
+    description={t("landing.subtitle")}
+>
+    <main class="landing-page">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge">
+                <span class="badge-dot" aria-hidden="true"></span>
+                <span>{t("landing.badge")}</span>
+            </div>
+
+            <h1 class="hero-title">
+                {t("landing.title")}
+            </h1>
+
+            <p class="hero-subtitle">
+                {t("landing.subtitle")}
+            </p>
+
+            <div class="hero-actions">
+                <a href={`/${locale}/tracks`} class="btn-primary">
+                    <span>{t("landing.cta")}</span>
+                    <span class="btn-arrow" aria-hidden="true">&rarr;</span>
+                </a>
+                <a href={`/${locale}/about`} class="btn-secondary">
+                    {t("landing.secondaryCta")}
+                </a>
+            </div>
+        </section>
+
+        <!-- Value Proposition Cards -->
+        <section class="features-section">
+            <div class="features-grid">
+                {
+                    features.map((item) => (
+                        <div class="feature-card">
+                            <span class="feature-tag">{item.tag}</span>
+                            <h2 class="feature-title">{item.title}</h2>
+                            <p class="feature-desc">{item.desc}</p>
+                        </div>
+                    ))
+                }
+            </div>
+        </section>
+    </main>
+</GlobalLayout>
+
+<style>
+    .landing-page {
+        max-width: var(--max-w-layout, 1100px);
+        margin-inline: auto;
+        padding-inline: var(--space-4, 1rem);
+        padding-block: var(--space-12, 3rem) var(--space-16, 4rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-16, 4rem);
+    }
+
+    .hero-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        max-width: 780px;
+        margin-inline: auto;
+        padding-block: var(--space-8, 2rem) var(--space-4, 1rem);
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2, 0.5rem);
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: var(--text-xs, 0.75rem);
+        font-family: var(--font-mono, monospace);
+        color: var(--text-secondary);
+        margin-block-end: var(--space-6, 1.5rem);
+    }
+
+    .badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+    }
+
+    .hero-title {
+        font-size: clamp(2rem, 1.5rem + 2.5vw, 3.25rem);
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+        margin-block-end: var(--space-4, 1rem);
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1rem, 0.95rem + 0.35vw, 1.15rem);
+        color: var(--text-secondary);
+        line-height: 1.65;
+        max-width: 60ch;
+        margin-block-end: var(--space-8, 2rem);
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3, 0.75rem);
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2, 0.5rem);
+        background-color: var(--accent);
+        color: #ffffff;
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+        padding: 0.65rem 1.25rem;
+        border-radius: var(--radius-sm, 6px);
+        text-decoration: none;
+        transition:
+            background-color 120ms ease,
+            transform 120ms ease;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--accent-hover);
+        transform: translateY(-1px);
+    }
+
+    .btn-arrow {
+        display: inline-block;
+        transition: transform 120ms ease;
+    }
+
+    :global([dir="ltr"]) .btn-primary:hover .btn-arrow {
+        transform: translateX(3px);
+    }
+
+    :global([dir="rtl"]) .btn-arrow {
+        transform: rotate(180deg);
+    }
+
+    :global([dir="rtl"]) .btn-primary:hover .btn-arrow {
+        transform: rotate(180deg) translateX(3px);
+    }
+
+    .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--bg-surface);
+        color: var(--text-primary);
+        border: 1px solid var(--border-subtle);
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 500;
+        padding: 0.65rem 1.25rem;
+        border-radius: var(--radius-sm, 6px);
+        text-decoration: none;
+        transition:
+            background-color 120ms ease,
+            border-color 120ms ease;
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--bg-surface-hover);
+        border-color: var(--border-strong);
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-4, 1rem);
+    }
+
+    .feature-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md, 10px);
+        padding: var(--space-6, 1.5rem);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2, 0.5rem);
+        transition:
+            border-color 120ms ease,
+            background-color 120ms ease;
+    }
+
+    .feature-card:hover {
+        border-color: var(--border-strong);
+        background-color: var(--bg-surface-hover);
+    }
+
+    .feature-tag {
+        font-size: var(--text-xs, 0.75rem);
+        font-family: var(--font-mono, monospace);
+        color: var(--accent);
+        background: var(--accent-subtle);
+        padding: 0.15rem 0.5rem;
+        border-radius: var(--radius-sm, 6px);
+        font-weight: 600;
+    }
+
+    .feature-title {
+        font-size: var(--text-base, 1rem);
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-block-start: var(--space-1, 0.25rem);
+    }
+
+    .feature-desc {
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+</style>

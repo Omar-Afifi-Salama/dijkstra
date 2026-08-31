@@ -1,46 +1,79 @@
-# Astro Starter Kit: Basics
+# dijkstra\_
 
-```sh
-npm create astro@latest -- --template basics
-```
+An open-source, local-first developer learning platform engineered to teach computer science and software architecture from first principles with dual-language parity (English / Arabic).
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+---
 
-## 🚀 Project Structure
+## Overview
 
-Inside of your Astro project, you'll see the following folders and files:
+`dijkstra_` provides structured learning roadmaps, in-depth technical deep dives, algorithmic challenges, and production-grade projects. Designed with a minimalist developer-centric UI, the platform prioritizes performance, zero distraction, and local privacy.
+
+### Core Features
+
+- **Bilingual Parity:** Native English (LTR) and Arabic (RTL) content mirroring across all curriculums.
+- **Local-First Progress:** Real-time state persistence stored directly in the browser with zero mandatory account barriers.
+- **Structured Roadmaps:** Directed dependency pathways spanning beginner fundamentals to high-performance systems engineering.
+- **Modular Content Collections:** Content organized by type (`lessons`, `challenges`, `projects`) across language tracks (`python`, `javascript`, `cpp`).
+
+---
+
+## Tech Stack
+
+- **Framework:** [Astro](https://www.google.com/search?q=https://astro.build/)
+- **Content Layer:** Astro Content Collections (Markdown / MDX)
+- **State Management:** Custom local-first reactive user store (`nanostores` / `localStorage`)
+- **Internationalization:** Custom JSON-driven path-based i18n routing (`/[locale]/...`)
+- **Styling:** Semantic CSS tokens with logical properties for seamless bidirectional (LTR/RTL) rendering
+
+---
+
+## Project Structure
 
 ```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+├── src/
+│   ├── components/       # NavIsland, CompletionToggle, TrackProgress, etc.
+│   ├── content/          # Markdown/MDX content collections
+│   │   ├── lessons/
+│   │   ├── challenges/
+│   │   └── projects/
+│   ├── data/             # Roadmaps sequence configurations
+│   ├── i18n/             # Locale dictionaries (en.json, ar.json)
+│   ├── layouts/          # GlobalLayout.astro and base wrappers
+│   ├── pages/            # File-based localized routing
+│   ├── stores/           # Local-first user progress stores
+│   └── styles/           # Global design tokens and prose stylesheets
+└── FORWRITERS.md         # Content contribution guide
+
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+---
 
-## 🧞 Commands
+## Getting Started
 
-All commands are run from the root of the project, from a terminal:
+### Prerequisites
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+- Node.js `>= 18.14.0`
+- `npm` (recommended), `pnpm`, or `yarn`
 
-## 👀 Want to learn more?
+### Installation & Development
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```bash
+# Clone the repository
+git clone https://github.com/your-username/dijkstra.git
+cd dijkstra
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+```
+
+Visit `http://localhost:4321` to inspect the application.
+
+---
+
+## Contributing Content
+
+Interested in authoring lessons, writing challenges, or translating curriculum into Arabic or English? Check out [FORWRITERS.md](./FORWRITERS.md) for contribution workflows, schemas, and guidelines.

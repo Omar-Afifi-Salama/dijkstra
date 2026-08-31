@@ -1,0 +1,169 @@
+{
+    "name": "English",
+    "dir": "ltr",
+    "nav": {
+        "home": "Home",
+        "tracks": "Tracks",
+        "about": "About",
+
+        "backTo": "Back to",
+        "backToDashboard": "Back to Dashboard",
+        "backToRoadmap": "Back to Roadmap",
+
+        "ariaLabel": "Lesson Navigation",
+        "backToParent": "Back to {parent}",
+        "previous": "Previous",
+        "next": "Next",
+        "stepOf": "Step {current} of {total}"
+    },
+    "sections": {
+        "roadmap": "Roadmap",
+        "roadmapDesc": "Structured sequential pathway from beginner to advanced concepts.",
+        "lessons": "Lessons",
+        "lessonsDesc": "In-depth guides, articles, and conceptual deep dives.",
+        "challenges": "Challenges",
+        "challengesDesc": "Hands-on coding exercises and algorithmic problem solving.",
+        "projects": "Projects",
+        "projectsDesc": "End-to-end production-ready applications."
+    },
+    "landing": {
+        "badge": "Developer Learning Platform",
+        "title": "Master Software Engineering from First Principles",
+        "subtitle": "An open, local-first learning environment tailored for curious developers. Minimalist, bilingual, and free from distraction.",
+        "cta": "Explore Tracks",
+        "secondaryCta": "About Platform",
+        "features": {
+            "roadmaps": {
+                "tag": "Structured",
+                "title": "Interactive Roadmaps",
+                "desc": "Step-by-step learning tracks tailored from foundational concepts to production-level architecture."
+            },
+            "localFirst": {
+                "tag": "Local-First",
+                "title": "Zero Friction Progress",
+                "desc": "Your progress and code drafts are preserved instantly in your browser with zero sign-up friction."
+            },
+            "bilingual": {
+                "tag": "Bilingual",
+                "title": "Dual Language Parity",
+                "desc": "Seamlessly switch between English and Arabic explanations without losing your spot or progress."
+            }
+        }
+    },
+    "progress": {
+        "completed": "Completed",
+        "trackProgress": "Track Progress"
+    },
+    "tracks": {
+        "title": "Learning Tracks",
+        "subtitle": "Choose a language or technology track to begin your structured journey.",
+        "startTrack": "Start Track",
+        "continueTrack": "Continue",
+        "itemsCount": "{count} modules",
+        "descriptions": {
+            "python": "Master Python fundamentals, data structures, and backend patterns from scratch.",
+            "javascript": "Modern JavaScript, asynchronous programming, DOM APIs, and ecosystem standards.",
+            "cpp": "Low-level memory management, pointers, and high-performance systems engineering."
+        }
+    },
+    "dashboard": {
+        "title": "{track} Overview",
+        "subtitle": "Explore modular collections or follow the guided sequential path.",
+        "backToTracks": "Back to tracks",
+        "counts": {
+            "steps": "{count} steps",
+            "lessons": "{count} lessons",
+            "challenges": "{count} challenges",
+            "projects": "{count} projects"
+        }
+    },
+    "gateways": {
+        "roadmap": {
+            "badge": "Recommended",
+            "btnText": "Start Track"
+        },
+        "lessons": {
+            "badge": "Theory & Deep Dives",
+            "btnText": "Browse Lessons"
+        },
+        "challenges": {
+            "badge": "Interactive Practice",
+            "btnText": "Solve Challenges"
+        },
+        "projects": {
+            "badge": "Real-World Apps",
+            "btnText": "Build Projects"
+        }
+    },
+    "roadmap": {
+        "subtitle": "Follow the structured step-by-step path from fundamental principles to full mastery."
+    },
+    "units": {
+        "estimatedMinutes": "{minutes} min"
+    },
+    "notFound": {
+        "code": "404",
+        "title": "Page Not Found",
+        "description": "The lesson, track, or resource you are looking for has been moved or does not exist in Dijkstra's graph.",
+        "backHome": "Back to Home",
+        "exploreTracks": "Explore Tracks"
+    },
+    "about": {
+        "title": "About Dijkstra",
+        "subtitle": "An independent, local-first developer platform engineered to teach computer science and software architecture from first principles.",
+        "badge": "About Platform",
+        "mission": {
+            "tag": "Our Philosophy",
+            "title": "Built for Depth, Not Shortcuts",
+            "p1": "Modern web development often prioritizes fragmented snippets and framework churn over foundational understanding. Dijkstra is built to reverse that trend.",
+            "p2": "We believe deep technical intuition comes from structured paths, hands-on practice, and zero distraction. That is why our platform is completely local-first, lightweight, and engineered with dual-language parity from day one."
+        },
+        "values": {
+            "title": "Core Values",
+            "firstPrinciples": {
+                "title": "First Principles",
+                "desc": "Understanding why systems work under the hood rather than just copying high-level syntax."
+            },
+            "localFirst": {
+                "title": "Local & Frictionless",
+                "desc": "No mandatory account walls or bloated trackers. Your machine, your storage, your progress."
+            },
+            "bilingual": {
+                "title": "Bilingual Parity",
+                "desc": "Equally rigorous technical content authored natively in both Arabic and English."
+            }
+        },
+        "team": {
+            "tag": "Contributors",
+            "title": "The Team",
+            "subtitle": "Engineers and educators building open curriculum for the next generation of developers.",
+            "connect": "Get in touch",
+            "members": {
+                "omar": {
+                    "name": "Omar Afifi",
+                    "role": "Founder & Core Engineer",
+                    "bio": "Focuses on developer tooling, system architecture, and open computer science curriculum."
+                },
+                "core": {
+                    "name": "Dijkstra Core",
+                    "role": "Curriculum & Community",
+                    "bio": "Open source contributors and educators crafting challenges and technical deep-dives."
+                }
+            }
+        }
+    },
+    "og": {
+        "platformBadge": "PLATFORM",
+        "trackBadge": "TRACK",
+        "defaultSubtitle": "Computer science & software architecture from first principles.",
+        "trackSubtitle": "Complete structured curriculum for {track}",
+        "footerTagline": "first-principles • local-first • bilingual"
+    },
+    "offline": {
+        "save": "Save Offline",
+        "saved": "Saved Offline",
+        "downloading": "Downloading...",
+        "removing": "Removing...",
+        "failed": "Download Failed"
+    }
+}

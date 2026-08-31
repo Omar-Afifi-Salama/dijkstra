@@ -1,0 +1,417 @@
+---
+// src/components/Header.astro
+import ThemeSelector from "./ThemeSelector.astro";
+import LanguageSelector from "./LanguageSelector.astro";
+import { useTranslations } from "../i18n/utils";
+
+interface Props {
+    locale: string;
+}
+
+const { locale } = Astro.props;
+const { t } = useTranslations(locale);
+const pathname = new URL(Astro.request.url).pathname;
+
+const navItems = [
+    { label: t("nav.home") || "Home", href: `/${locale}` },
+    { label: t("nav.tracks") || "Tracks", href: `/${locale}/tracks` },
+    { label: t("nav.about") || "About", href: `/${locale}/about` },
+];
+---
+
+<header class="site-header">
+    <nav class="nav-container" aria-label="Main Navigation">
+        <div class="nav-start">
+            <!-- Mobile Hamburger Button -->
+            <button
+                id="mobile-menu-open"
+                class="mobile-toggle"
+                type="button"
+                aria-label="Open menu"
+                aria-expanded="false"
+                aria-controls="mobile-drawer"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    width="22"
+                    height="22"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <!-- Brand -->
+            <a href={`/${locale}`} class="brand">
+                <span class="brand-name">dijkstra</span><span
+                    class="brand-cursor">_</span
+                >
+            </a>
+        </div>
+
+        <!-- Desktop Navigation Links -->
+        <ul class="nav-links desktop-only">
+            {
+                navItems.map((item) => {
+                    const isActive =
+                        pathname === item.href ||
+                        (item.href !== `/${locale}` &&
+                            pathname.startsWith(item.href));
+                    return (
+                        <li>
+                            <a
+                                href={item.href}
+                                class:list={["nav-link", { active: isActive }]}
+                                aria-current={isActive ? "page" : undefined}
+                            >
+                                {item.label}
+                            </a>
+                        </li>
+                    );
+                })
+            }
+        </ul>
+
+        <!-- Desktop Controls -->
+        <div class="nav-actions desktop-only">
+            <LanguageSelector locale={locale} />
+            <ThemeSelector />
+        </div>
+    </nav>
+
+    <!-- Mobile Drawer Backdrop -->
+    <div id="drawer-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
+
+    <!-- Mobile Drawer Panel -->
+    <aside
+        id="mobile-drawer"
+        class="mobile-drawer"
+        aria-label="Mobile Navigation"
+        aria-hidden="true"
+    >
+        <div class="drawer-header">
+            <span class="brand">
+                <span class="brand-name">dijkstra</span><span
+                    class="brand-cursor">_</span
+                >
+            </span>
+            <button
+                id="mobile-menu-close"
+                class="close-button"
+                type="button"
+                aria-label="Close menu"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Drawer Nav Links -->
+        <ul class="drawer-links">
+            {
+                navItems.map((item) => {
+                    const isActive =
+                        pathname === item.href ||
+                        (item.href !== `/${locale}` &&
+                            pathname.startsWith(item.href));
+                    return (
+                        <li>
+                            <a
+                                href={item.href}
+                                class:list={[
+                                    "drawer-link",
+                                    { active: isActive },
+                                ]}
+                                aria-current={isActive ? "page" : undefined}
+                            >
+                                {item.label}
+                            </a>
+                        </li>
+                    );
+                })
+            }
+        </ul>
+
+        <!-- Drawer Controls Section (Bottom of Drawer) -->
+        <div class="drawer-footer">
+            <span>{locale === "ar" ? "الإعدادات" : "Preferences"}</span>
+            <div class="drawer-actions">
+                <LanguageSelector locale={locale} />
+                <ThemeSelector />
+            </div>
+        </div>
+    </aside>
+</header>
+
+<style>
+    .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        width: 100%;
+        background-color: var(--bg-page);
+        border-block-end: 1px solid var(--border-subtle);
+    }
+
+    .nav-container {
+        max-width: var(--max-w-layout, 1100px);
+        margin-inline: auto;
+        padding-inline: var(--space-4, 1rem);
+        height: 3.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3, 0.75rem);
+    }
+
+    .nav-start {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3, 0.75rem);
+    }
+
+    .brand {
+        font-family: var(--font-mono, monospace);
+        font-weight: 700;
+        font-size: var(--text-lg, 1.125rem);
+        color: var(--text-primary);
+        text-decoration: none;
+    }
+
+    .brand-cursor {
+        color: var(--accent);
+        animation: blink 1.2s steps(2, start) infinite;
+    }
+
+    @keyframes blink {
+        to {
+            visibility: hidden;
+        }
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2, 0.5rem);
+        list-style: none;
+    }
+
+    .nav-link {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 500;
+        color: var(--text-secondary);
+        padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+        border-radius: var(--radius-sm, 6px);
+        transition:
+            color 120ms ease,
+            background-color 120ms ease;
+    }
+
+    .nav-link:hover {
+        color: var(--text-primary);
+        background-color: var(--bg-surface-hover);
+    }
+
+    .nav-link.active {
+        color: var(--accent);
+        background-color: var(--accent-subtle);
+    }
+
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2, 0.5rem);
+    }
+
+    /* Hamburger & Close Buttons */
+    .mobile-toggle,
+    .close-button {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: var(--radius-sm, 6px);
+        border: 1px solid var(--border-subtle);
+        background-color: var(--bg-surface);
+        color: var(--text-primary);
+        cursor: pointer;
+    }
+
+    .mobile-toggle:hover,
+    .close-button:hover {
+        background-color: var(--bg-surface-hover);
+    }
+
+    /* Drawer Backdrop */
+    .drawer-backdrop {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 200ms ease;
+        z-index: 50;
+    }
+
+    .drawer-backdrop.is-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Mobile Drawer Panel */
+    .mobile-drawer {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        inset-inline-start: 0;
+        width: min(18rem, 100vw);
+        background-color: var(--bg-surface);
+        border-inline-end: 1px solid var(--border-subtle);
+        padding: var(--space-4, 1rem);
+        display: flex;
+        flex-direction: column;
+        z-index: 60;
+        transform: translateX(-100%);
+        transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    :global([dir="rtl"]) .mobile-drawer {
+        transform: translateX(100%);
+    }
+
+    .mobile-drawer.is-open {
+        transform: translateX(0) !important;
+    }
+
+    .drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-block-end: var(--space-4, 1rem);
+        border-block-end: 1px solid var(--border-subtle);
+    }
+
+    .drawer-links {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2, 0.5rem);
+        margin-block-start: var(--space-4, 1rem);
+        flex: 1;
+        padding-inline-start: 0;
+    }
+
+    .drawer-link {
+        display: block;
+        padding: var(--space-3, 0.75rem);
+        border-radius: var(--radius-sm, 6px);
+        font-size: var(--text-base, 1rem);
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    .drawer-link:hover {
+        background-color: var(--bg-surface-hover);
+        color: var(--text-primary);
+    }
+
+    .drawer-link.active {
+        color: var(--accent);
+        background-color: var(--accent-subtle);
+    }
+
+    .drawer-footer {
+        border-block-start: 1px solid var(--border-subtle);
+        padding-block-start: var(--space-4, 1rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2, 0.5rem);
+    }
+
+    .drawer-footer span {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .drawer-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-2, 0.5rem);
+    }
+
+    /* Responsive Visibility */
+    @media (max-width: 768px) {
+        .desktop-only {
+            display: none !important;
+        }
+
+        .mobile-toggle,
+        .close-button {
+            display: inline-flex;
+        }
+    }
+</style>
+
+<script>
+    function setupDrawer() {
+        const openBtn = document.getElementById("mobile-menu-open");
+        const closeBtn = document.getElementById("mobile-menu-close");
+        const drawer = document.getElementById("mobile-drawer");
+        const backdrop = document.getElementById("drawer-backdrop");
+
+        if (!openBtn || !closeBtn || !drawer || !backdrop) return;
+
+        function open() {
+            drawer?.classList.add("is-open");
+            backdrop?.classList.add("is-open");
+            openBtn?.setAttribute("aria-expanded", "true");
+            drawer?.setAttribute("aria-hidden", "false");
+            backdrop?.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+        }
+
+        function close() {
+            drawer?.classList.remove("is-open");
+            backdrop?.classList.remove("is-open");
+            openBtn?.setAttribute("aria-expanded", "false");
+            drawer?.setAttribute("aria-hidden", "true");
+            backdrop?.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+        }
+
+        openBtn.onclick = open;
+        closeBtn.onclick = close;
+        backdrop.onclick = close;
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && drawer.classList.contains("is-open")) {
+                close();
+            }
+        });
+    }
+
+    setupDrawer();
+    document.addEventListener("astro:after-swap", setupDrawer);
+</script>

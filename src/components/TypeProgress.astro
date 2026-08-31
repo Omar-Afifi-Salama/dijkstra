@@ -1,0 +1,124 @@
+---
+// src/components/TypeProgress.astro
+import { useTranslations } from "../i18n/utils";
+
+interface Props {
+    track: string;
+    type: string;
+    totalItems: number;
+    locale: string;
+}
+
+const { track, type, totalItems, locale } = Astro.props;
+const { t } = useTranslations(locale);
+---
+
+<div
+    class="type-progress-card"
+    data-track={track}
+    data-type={type}
+    data-total={totalItems}
+>
+    <div class="progress-info">
+        <span class="progress-title">
+            {t("progress.completed") || "Completed"}
+        </span>
+        <span class="progress-numbers">
+            <span class="type-completed-count">0</span> / {totalItems}
+            <span class="percentage-badge">(0%)</span>
+        </span>
+    </div>
+
+    <div
+        class="progress-bar-bg"
+        role="progressbar"
+        aria-valuenow="0"
+        aria-valuemin="0"
+        aria-valuemax="100"
+    >
+        <div class="progress-bar-fill" style="width: 0%;"></div>
+    </div>
+</div>
+
+<style>
+    .type-progress-card {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: var(--space-4);
+        margin-block: var(--space-4) var(--space-6);
+    }
+
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: var(--text-sm);
+        margin-block-end: var(--space-2);
+    }
+
+    .progress-title {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .progress-numbers {
+        font-family: var(--font-mono, monospace);
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .percentage-badge {
+        color: var(--accent);
+        margin-inline-start: var(--space-1);
+    }
+
+    .progress-bar-bg {
+        height: 6px;
+        width: 100%;
+        background-color: var(--bg-surface-subtle);
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background-color: var(--accent);
+        border-radius: 999px;
+        transition: width 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+</style>
+
+<script>
+    import { userDataStore, getTypeCompletedCount } from "../stores/userStore";
+
+    function updateTypeProgressBars() {
+        const bars = document.querySelectorAll<HTMLElement>(
+            ".type-progress-card",
+        );
+
+        bars.forEach((el) => {
+            const track = el.dataset.track;
+            const type = el.dataset.type;
+            const total = parseInt(el.dataset.total || "0", 10);
+            if (!track || !type || !total) return;
+
+            const count = getTypeCompletedCount(track, type);
+            const percent = Math.min(100, Math.round((count / total) * 100));
+
+            const countSpan = el.querySelector(".type-completed-count");
+            const badge = el.querySelector(".percentage-badge");
+            const fill = el.querySelector<HTMLElement>(".progress-bar-fill");
+            const bar = el.querySelector(".progress-bar-bg");
+
+            if (countSpan) countSpan.textContent = String(count);
+            if (badge) badge.textContent = `(${percent}%)`;
+            if (fill) fill.style.width = `${percent}%`;
+            if (bar) bar.setAttribute("aria-valuenow", String(percent));
+        });
+    }
+
+    updateTypeProgressBars();
+    userDataStore.listen(updateTypeProgressBars);
+    document.addEventListener("astro:after-swap", updateTypeProgressBars);
+</script>

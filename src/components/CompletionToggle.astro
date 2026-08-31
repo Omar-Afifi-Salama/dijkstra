@@ -1,0 +1,152 @@
+---
+// src/components/CompletionToggle.astro
+import { createItemKey } from "../stores/userStore";
+import { useTranslations } from "../i18n/utils";
+
+interface Props {
+    track: string;
+    type: string;
+    slug: string;
+    locale: string;
+}
+
+const { track, type, slug, locale } = Astro.props;
+const { t } = useTranslations(locale);
+const canonicalKey = createItemKey(track, type, slug);
+---
+
+<button
+    class="completion-toggle-btn"
+    data-item-key={canonicalKey}
+    type="button"
+    aria-pressed="false"
+>
+    <span class="checkbox-box" aria-hidden="true">
+        <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            stroke="currentColor"
+            stroke-width="3"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+    </span>
+    <span class="label-uncompleted"
+        >{locale === "ar" ? "تحديد كمكتمل" : "Mark as completed"}</span
+    >
+    <span class="label-completed"
+        >{locale === "ar" ? "مكتمل ✓" : "Completed ✓"}</span
+    >
+</button>
+
+<style>
+    .completion-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-3, 0.75rem);
+        padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md, 10px);
+        color: var(--text-secondary);
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .completion-toggle-btn:hover {
+        border-color: var(--border-strong);
+        background-color: var(--bg-surface-hover);
+        color: var(--text-primary);
+    }
+
+    .checkbox-box {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: var(--radius-sm, 6px);
+        border: 1.5px solid var(--border-strong);
+        background: var(--bg-surface-subtle);
+        transition: all 150ms ease;
+    }
+
+    .check-icon {
+        display: none;
+        color: #ffffff;
+    }
+
+    .label-completed {
+        display: none;
+    }
+
+    /* Active Completed State */
+    .completion-toggle-btn.is-completed {
+        background-color: var(--accent-subtle);
+        border-color: var(--accent);
+        color: var(--text-primary);
+    }
+
+    .completion-toggle-btn.is-completed .checkbox-box {
+        background-color: var(--accent);
+        border-color: var(--accent);
+    }
+
+    .completion-toggle-btn.is-completed .check-icon {
+        display: block;
+    }
+
+    .completion-toggle-btn.is-completed .label-uncompleted {
+        display: none;
+    }
+
+    .completion-toggle-btn.is-completed .label-completed {
+        display: inline;
+        font-weight: 600;
+    }
+</style>
+
+<script>
+    import {
+        userDataStore,
+        toggleItemCompletion,
+        isItemCompleted,
+    } from "../stores/userStore";
+
+    function setupCompletionToggles() {
+        const buttons = document.querySelectorAll<HTMLButtonElement>(
+            ".completion-toggle-btn",
+        );
+
+        function render() {
+            buttons.forEach((btn) => {
+                const key = btn.dataset.itemKey;
+                if (!key) return;
+
+                const completed = isItemCompleted(key);
+                btn.classList.toggle("is-completed", completed);
+                btn.setAttribute("aria-pressed", completed ? "true" : "false");
+            });
+        }
+
+        render();
+        userDataStore.listen(render);
+
+        buttons.forEach((btn) => {
+            btn.onclick = () => {
+                const key = btn.dataset.itemKey;
+                if (key) toggleItemCompletion(key);
+            };
+        });
+    }
+
+    setupCompletionToggles();
+    document.addEventListener("astro:after-swap", setupCompletionToggles);
+</script>

@@ -1,0 +1,359 @@
+---
+// src/pages/[locale]/[track]/roadmap/index.astro
+import { supportedLocales, useTranslations } from "../../../../i18n/utils";
+import { supportedTracks } from "../../../../utils/routes";
+import { getTrackRoadmap } from "../../../../utils/roadmapResolver";
+import type { Track } from "../../../../data/roadmaps";
+import GlobalLayout from "../../../../layouts/GlobalLayout.astro";
+import TrackProgress from "../../../../components/TrackProgress.astro";
+import { createItemKey } from "../../../../stores/userStore";
+
+export function getStaticPaths() {
+  return supportedLocales.flatMap((locale) =>
+    supportedTracks.map((track) => ({
+      params: { locale, track },
+    }))
+  );
+}
+
+const { locale, track } = Astro.params;
+const { t } = useTranslations(locale);
+const steps = await getTrackRoadmap(locale, track as Track);
+
+const trackCapitalized = track.charAt(0).toUpperCase() + track.slice(1);
+const totalSteps = steps.length;
+---
+
+<GlobalLayout
+  title={`dijkstra_ | ${trackCapitalized} | ${t("sections.roadmap")}`}
+  locale={locale}
+  description={t("roadmap.subtitle") || t("landing.subtitle")}
+>
+  <main class="container">
+    <!-- Polished Back Navigation Link -->
+    <a href={`/${locale}/${track}`} class="back-link">
+      <svg class="back-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>{t("nav.backToDashboard") || "Back to dashboard"}</span>
+    </a>
+
+    <!-- Header Block -->
+    <header class="roadmap-header">
+      <div class="header-badge">
+        <span class="badge-dot" aria-hidden="true"></span>
+        <span>{trackCapitalized}</span>
+      </div>
+      <h1 class="page-title">{trackCapitalized} {t("sections.roadmap")}</h1>
+      <p class="roadmap-desc">
+        {t("roadmap.subtitle") || "Follow the structured path from basics to mastery."}
+      </p>
+    </header>
+
+    <!-- Track-wide Progress Metric Bar -->
+    <TrackProgress track={track} totalItems={totalSteps} locale={locale} />
+
+    <!-- Vertical Tree Timeline -->
+    <div class="roadmap-tree">
+      <ol class="tree-list">
+        {
+          steps.map((step) => {
+            const canonicalKey = createItemKey(track, step.type, step.slug);
+            return (
+              <li class="tree-node" data-item-key={canonicalKey}>
+                <!-- Connecting Vertical Stem Line -->
+                <div class="tree-stem" aria-hidden="true" />
+
+                <!-- Status Node Icon Checkpoint -->
+                <div class="tree-icon" aria-hidden="true">
+                  <span class="step-num">{String(step.stepNumber).padStart(2, "0")}</span>
+                  <svg class="check-mark" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+
+                <!-- Step Card -->
+                <a
+                  href={`/${locale}/${track}/roadmap/${step.type}/${step.slug}`}
+                  class="tree-card"
+                >
+                  <div class="card-meta">
+                    <span class={`type-badge badge-${step.type}`}>
+                      {t(`sections.${step.type}`) || step.type}
+                    </span>
+                    <span class="step-label">
+                      {t("nav.stepOf", { current: step.stepNumber, total: totalSteps }) || `Step ${step.stepNumber} of ${totalSteps}`}
+                    </span>
+                  </div>
+
+                  <h2 class="card-title">{step.title}</h2>
+                  {step.description && <p class="card-desc">{step.description}</p>}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </div>
+  </main>
+</GlobalLayout>
+
+<style>
+  /* Header & Meta */
+  .roadmap-header {
+    margin-block: var(--space-4, 1rem) var(--space-6, 1.5rem);
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2, 0.5rem);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: var(--text-xs, 0.75rem);
+    font-family: var(--font-mono, monospace);
+    color: var(--text-secondary);
+    margin-block-end: var(--space-3, 0.75rem);
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .page-title {
+    font-size: var(--text-3xl, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-block-end: var(--space-2, 0.5rem);
+  }
+
+  .roadmap-desc {
+    color: var(--text-secondary);
+    font-size: var(--text-base, 1rem);
+    max-width: 60ch;
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2, 0.5rem);
+    font-size: var(--text-xs, 0.75rem);
+    font-family: var(--font-mono, monospace);
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.35rem 0.6rem;
+    margin-inline-start: -0.6rem;
+    border-radius: var(--radius-sm, 6px);
+    transition: color 120ms ease, background-color 120ms ease;
+  }
+
+  .back-link:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-surface-hover);
+  }
+
+  .back-icon {
+    flex-shrink: 0;
+    transition: transform 150ms ease;
+  }
+
+  :global([dir="ltr"]) .back-link:hover .back-icon {
+    transform: translateX(-3px);
+  }
+
+  :global([dir="rtl"]) .back-icon {
+    transform: rotate(180deg);
+  }
+
+  :global([dir="rtl"]) .back-link:hover .back-icon {
+    transform: rotate(180deg) translateX(-3px);
+  }
+
+  /* Roadmap Tree Layout */
+  .roadmap-tree {
+    position: relative;
+    margin-block-start: var(--space-8, 2rem);
+  }
+
+  .tree-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6, 1.5rem);
+    position: relative;
+  }
+
+  .tree-node {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4, 1rem);
+    position: relative;
+  }
+
+  /* Vertical Connecting Line */
+  .tree-stem {
+    position: absolute;
+    top: 2.25rem;
+    bottom: -1.75rem;
+    inset-inline-start: 1.125rem;
+    width: 2px;
+    background-color: var(--border-subtle);
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+
+  :global([dir="rtl"]) .tree-stem {
+    transform: translateX(50%);
+  }
+
+  .tree-node:last-child .tree-stem {
+    display: none;
+  }
+
+  /* Status Circle Node */
+  .tree-icon {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border-strong);
+    color: var(--text-muted);
+    font-size: var(--text-xs, 0.75rem);
+    font-family: var(--font-mono, monospace);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .check-mark {
+    display: none;
+  }
+
+  /* Step Card Content */
+  .tree-card {
+    flex: 1;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md, 10px);
+    padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 0.5rem);
+    transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
+  }
+
+  .tree-card:hover {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2, 0.5rem);
+  }
+
+  .type-badge {
+    font-size: var(--text-xs, 0.75rem);
+    font-family: var(--font-mono, monospace);
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--radius-sm, 6px);
+  }
+
+  .badge-lessons {
+    background: var(--accent-subtle);
+    color: var(--accent);
+  }
+
+  .badge-challenges {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+  }
+
+  .badge-projects {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+  }
+
+  .step-label {
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--text-muted);
+    font-family: var(--font-mono, monospace);
+  }
+
+  .card-title {
+    font-size: var(--text-base, 1rem);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .card-desc {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* Completed Status Modifiers */
+  .tree-node.is-completed .tree-icon {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .tree-node.is-completed .step-num {
+    display: none;
+  }
+
+  .tree-node.is-completed .check-mark {
+    display: block;
+  }
+
+  .tree-node.is-completed .tree-stem {
+    background-color: var(--accent);
+  }
+
+  .tree-node.is-completed .tree-card {
+    border-color: var(--accent-subtle);
+  }
+</style>
+
+<script>
+  import { userDataStore, isItemCompleted } from "../../../../stores/userStore";
+
+  function syncRoadmapTree() {
+    const nodes = document.querySelectorAll<HTMLElement>(".tree-node");
+    nodes.forEach((node) => {
+      const key = node.dataset.itemKey;
+      if (!key) return;
+
+      const completed = isItemCompleted(key);
+      node.classList.toggle("is-completed", completed);
+    });
+  }
+
+  syncRoadmapTree();
+  userDataStore.listen(syncRoadmapTree);
+  document.addEventListener("astro:after-swap", syncRoadmapTree);
+</script>

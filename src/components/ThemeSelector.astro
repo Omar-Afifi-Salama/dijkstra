@@ -1,0 +1,116 @@
+---
+// src/components/ThemeSelector.astro
+---
+
+<button
+    class="theme-toggle-btn"
+    type="button"
+    aria-label="Toggle theme"
+    title="Toggle theme"
+>
+    <svg
+        class="sun-icon"
+        viewBox="0 0 24 24"
+        width="18"
+        height="18"
+        stroke="currentColor"
+        stroke-width="2"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+
+    <svg
+        class="moon-icon"
+        viewBox="0 0 24 24"
+        width="18"
+        height="18"
+        stroke="currentColor"
+        stroke-width="2"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+</button>
+
+<style>
+    .theme-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: var(--radius-sm, 6px);
+        border: 1px solid var(--border-subtle);
+        background-color: var(--bg-surface);
+        color: var(--text-primary);
+        cursor: pointer;
+        transition:
+            background-color 120ms ease,
+            border-color 120ms ease;
+    }
+
+    .theme-toggle-btn:hover {
+        background-color: var(--bg-surface-hover);
+        border-color: var(--border-strong);
+    }
+
+    .sun-icon {
+        display: none;
+    }
+    .moon-icon {
+        display: block;
+    }
+
+    :global(html[data-theme="dark"]) .sun-icon {
+        display: block;
+    }
+    :global(html[data-theme="dark"]) .moon-icon {
+        display: none;
+    }
+
+    :global(html[data-theme="light"]) .sun-icon {
+        display: none;
+    }
+    :global(html[data-theme="light"]) .moon-icon {
+        display: block;
+    }
+</style>
+
+<script>
+    import { userDataStore, toggleTheme } from "../stores/userStore";
+
+    function initTheme() {
+        const html = document.documentElement;
+
+        // Apply store theme on load
+        html.setAttribute("data-theme", userDataStore.get().theme);
+
+        // Keep DOM in sync with any store mutations
+        userDataStore.listen((data) => {
+            html.setAttribute("data-theme", data.theme);
+        });
+
+        const buttons = document.querySelectorAll(".theme-toggle-btn");
+        buttons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                toggleTheme();
+            });
+        });
+    }
+
+    initTheme();
+    document.addEventListener("astro:after-swap", initTheme);
+</script>

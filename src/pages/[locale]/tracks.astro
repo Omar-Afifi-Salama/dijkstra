@@ -1,0 +1,321 @@
+---
+// src/pages/[locale]/tracks.astro
+import GlobalLayout from "../../layouts/GlobalLayout.astro";
+import { supportedLocales, useTranslations } from "../../i18n/utils";
+import { supportedTracks } from "../../utils/routes";
+import { getCollection } from "astro:content";
+
+export function getStaticPaths() {
+  return supportedLocales.map((locale) => ({
+    params: { locale },
+  }));
+}
+
+const { locale } = Astro.params;
+const { t } = useTranslations(locale);
+
+// Pre-calculate total items per track for progress mapping
+const allLessons = await getCollection("lessons");
+const allChallenges = await getCollection("challenges");
+const allProjects = await getCollection("projects");
+
+const trackStats = supportedTracks.map((track) => {
+  const filterByTrack = (entry: any) => {
+    const [loc, trk] = entry.id.replace(/\.mdx?$/, "").split("/");
+    return loc === locale && trk === track;
+  };
+
+  const lessonsCount = allLessons.filter(filterByTrack).length;
+  const challengesCount = allChallenges.filter(filterByTrack).length;
+  const projectsCount = allProjects.filter(filterByTrack).length;
+  const total = lessonsCount + challengesCount + projectsCount;
+
+  return {
+    track,
+    total,
+  };
+});
+---
+
+<GlobalLayout
+  title={`dijkstra | ${t("tracks.title") || "Learning Tracks"}`}
+  locale={locale}
+  description={t("tracks.subtitle")}
+>
+  <main class="container">
+    <header class="tracks-header">
+      <div class="header-badge">
+        <span class="badge-dot" aria-hidden="true"></span>
+        <span>{locale === "ar" ? "المسارات المتاحة" : "Available Tracks"}</span>
+      </div>
+      <h1 class="page-title">{t("tracks.title") || "Learning Tracks"}</h1>
+      <p class="page-subtitle">{t("tracks.subtitle")}</p>
+    </header>
+
+    <div class="tracks-grid">
+      {
+        trackStats.map(({ track, total }) => {
+          const trackKey = track.toLowerCase();
+          const desc = t(`tracks.descriptions.${trackKey}`) || "";
+
+          return (
+            <a href={`/${locale}/${track}`} class="track-card" data-track={track} data-total={total}>
+              <div class="card-top">
+                <div class="track-badge">
+                  <span class="track-icon">#</span>
+                  <span class="track-name">{track.toUpperCase()}</span>
+                </div>
+                <span class="track-count">
+                  {total} {locale === "ar" ? "وحدة" : "units"}
+                </span>
+              </div>
+
+              <div class="card-body">
+                <h2 class="card-title">{track.toUpperCase()}</h2>
+                {desc && <p class="card-desc">{desc}</p>}
+              </div>
+
+              <!-- Mini Client-Side Progress Meter -->
+              <div class="card-progress">
+                <div class="progress-info">
+                  <span class="progress-status-label">{locale === "ar" ? "الإنجاز" : "Progress"}</span>
+                  <span class="progress-percent">0%</span>
+                </div>
+                <div class="progress-bar-track">
+                  <div class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <span class="action-cta">
+                  <span class="cta-text">{t("tracks.startTrack") || "Start Track"}</span>
+                  <span class="cta-arrow" aria-hidden="true">&rarr;</span>
+                </span>
+              </div>
+            </a>
+          );
+        })
+      }
+    </div>
+  </main>
+</GlobalLayout>
+
+<style>
+  .tracks-header {
+    margin-block: var(--space-6, 1.5rem) var(--space-8, 2rem);
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2, 0.5rem);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: var(--text-xs, 0.75rem);
+    font-family: var(--font-mono, monospace);
+    color: var(--text-secondary);
+    margin-block-end: var(--space-3, 0.75rem);
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .page-title {
+    font-size: var(--text-3xl, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-block-end: var(--space-2, 0.5rem);
+  }
+
+  .page-subtitle {
+    color: var(--text-secondary);
+    font-size: var(--text-base, 1rem);
+    max-width: 60ch;
+  }
+
+  /* Grid Layout */
+  .tracks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-4, 1rem);
+    margin-block-start: var(--space-6, 1.5rem);
+  }
+
+  .track-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md, 10px);
+    padding: var(--space-6, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-4, 1rem);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 120ms ease, border-color 120ms ease, background-color 120ms ease;
+  }
+
+  .track-card:hover {
+    background: var(--bg-surface-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .track-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono, monospace);
+    font-size: var(--text-xs, 0.75rem);
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-subtle);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm, 6px);
+  }
+
+  .track-icon {
+    opacity: 0.7;
+  }
+
+  .track-count {
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--text-muted);
+    font-family: var(--font-mono, monospace);
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 0.5rem);
+  }
+
+  .card-title {
+    font-size: var(--text-xl, 1.35rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .card-desc {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Progress Bar */
+  .card-progress {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1, 0.25rem);
+    padding-block: var(--space-2, 0.5rem);
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs, 0.75rem);
+  }
+
+  .progress-status-label {
+    color: var(--text-muted);
+  }
+
+  .progress-percent {
+    font-family: var(--font-mono, monospace);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .progress-bar-track {
+    height: 4px;
+    width: 100%;
+    background-color: var(--bg-surface-subtle);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background-color: var(--accent);
+    border-radius: 999px;
+    transition: width 250ms ease;
+  }
+
+  /* Card Action Footer */
+  .card-footer {
+    border-block-start: 1px solid var(--border-subtle);
+    padding-block-start: var(--space-3, 0.75rem);
+  }
+
+  .action-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2, 0.5rem);
+    font-size: var(--text-sm, 0.875rem);
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .cta-arrow {
+    display: inline-block;
+    transition: transform 120ms ease;
+  }
+
+  :global([dir="ltr"]) .track-card:hover .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  :global([dir="rtl"]) .cta-arrow {
+    transform: rotate(180deg);
+  }
+
+  :global([dir="rtl"]) .track-card:hover .cta-arrow {
+    transform: rotate(180deg) translateX(3px);
+  }
+</style>
+
+<script>
+  import { userDataStore, getTrackCompletedCount } from "../../stores/userStore";
+
+  function syncTrackCards() {
+    const cards = document.querySelectorAll<HTMLElement>(".track-card");
+
+    cards.forEach((card) => {
+      const track = card.dataset.track;
+      const total = parseInt(card.dataset.total || "0", 10);
+      if (!track || !total) return;
+
+      const completed = getTrackCompletedCount(track);
+      const percentage = Math.min(100, Math.round((completed / total) * 100));
+
+      const percentSpan = card.querySelector(".progress-percent");
+      const fillBar = card.querySelector<HTMLElement>(".progress-bar-fill");
+      const ctaText = card.querySelector(".cta-text");
+
+      if (percentSpan) percentSpan.textContent = `${percentage}%`;
+      if (fillBar) fillBar.style.width = `${percentage}%`;
+
+      if (ctaText && completed > 0) {
+        ctaText.textContent = document.documentElement.dir === "rtl" ? "متابعة المسار" : "Continue Track";
+      }
+    });
+  }
+
+  syncTrackCards();
+  userDataStore.listen(syncTrackCards);
+  document.addEventListener("astro:after-swap", syncTrackCards);
+</script>

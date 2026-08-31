@@ -1,0 +1,422 @@
+---
+// src/pages/[locale]/[track]/[type]/index.astro
+import { getCollection } from "astro:content";
+import { supportedLocales, useTranslations } from "../../../../i18n/utils";
+import { supportedTracks } from "../../../../utils/routes";
+import type { ContentType } from "../../../../data/roadmaps";
+import GlobalLayout from "../../../../layouts/GlobalLayout.astro";
+import TypeProgress from "../../../../components/TypeProgress.astro";
+import { createItemKey } from "../../../../stores/userStore";
+
+export function getStaticPaths() {
+    const types: ContentType[] = ["lessons", "challenges", "projects"];
+
+    return supportedLocales.flatMap((locale) =>
+        supportedTracks.flatMap((track) =>
+            types.map((type) => ({
+                params: { locale, track, type },
+            })),
+        ),
+    );
+}
+
+const { locale, track, type } = Astro.params;
+const { t } = useTranslations(locale);
+
+const allEntries = await getCollection(type as any);
+
+const filtered = allEntries
+    .filter((item: any) => {
+        // Normalizes ID structured as [locale]/[track]/...
+        const cleanId = item.id.replace(/\.mdx?$/, "");
+        const parts = cleanId.split("/");
+        return parts[0] === locale && parts[1] === track;
+    })
+    .sort((a: any, b: any) => (a.data.order ?? 99) - (b.data.order ?? 99));
+
+const trackCapitalized = track.charAt(0).toUpperCase() + track.slice(1);
+const totalItems = filtered.length;
+---
+
+<GlobalLayout
+    title={`dijkstra | ${trackCapitalized} | ${t(`sections.${type}`)}`}
+    locale={locale}
+    description={t(`sections.${type}Desc`) || t("landing.subtitle")}
+>
+    <main class="container">
+        <!-- Header Navigation -->
+        <a href={`/${locale}/${track}`} class="back-link">
+            <svg
+                class="back-icon"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+            >
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>{t("nav.backToDashboard") || "Back to dashboard"}</span>
+        </a>
+
+        <header class="collection-header">
+            <div class="header-meta">
+                <span class={`type-pill pill-${type}`}>
+                    {t(`sections.${type}`)}
+                </span>
+                <span class="track-name-badge">{trackCapitalized}</span>
+            </div>
+            <h1 class="page-title">
+                {trackCapitalized}{" "}
+                {t(`sections.${type}`)}
+            </h1>
+            <p class="collection-desc">{t(`sections.${type}Desc`)}</p>
+        </header>
+
+        <!-- Scoped Progress Bar (e.g., 4 / 12 Lessons) -->
+        <TypeProgress
+            track={track}
+            type={type}
+            totalItems={totalItems}
+            locale={locale}
+        />
+
+        <!-- Collection Items List -->
+        {
+            filtered.length > 0 ? (
+                <ul class="item-list">
+                    {filtered.map((item: any, idx: number) => {
+                        // Robust extraction: strip locale/track/type from path
+                        const cleanId = item.id.replace(/\.mdx?$/, "");
+                        const parts = cleanId.split("/");
+                        // parts[0] = locale, parts[1] = track, parts[2] = type (or omitted if flat), rest = slug
+                        const slugParts =
+                            parts[2] === type ? parts.slice(3) : parts.slice(2);
+                        const slug = slugParts.join("/");
+                        const canonicalKey = createItemKey(track, type, slug);
+
+                        return (
+                            <li class="item-row" data-item-key={canonicalKey}>
+                                <a
+                                    href={`/${locale}/${track}/${type}/${slug}`}
+                                    class="item-link"
+                                >
+                                    <div class="status-box" aria-hidden="true">
+                                        <span class="index-num">
+                                            {String(
+                                                item.data.order ?? idx + 1,
+                                            ).padStart(2, "0")}
+                                        </span>
+                                        <svg
+                                            class="check-icon"
+                                            viewBox="0 0 24 24"
+                                            width="16"
+                                            height="16"
+                                            stroke="currentColor"
+                                            stroke-width="3"
+                                            fill="none"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                    </div>
+
+                                    <div class="item-info">
+                                        <div class="item-header-row">
+                                            <strong class="item-title">
+                                                {item.data.title}
+                                            </strong>
+                                            {item.data.duration && (
+                                                <span class="item-duration">
+                                                    {item.data.duration}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {item.data.description && (
+                                            <p class="item-desc">
+                                                {item.data.description}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <span class="row-arrow" aria-hidden="true">
+                                        &rarr;
+                                    </span>
+                                </a>
+                            </li>
+                        );
+                    })}
+                </ul>
+            ) : (
+                <div class="empty-state">
+                    <p>
+                        {locale === "ar"
+                            ? "لا يوجد محتوى متوفر حالياً في هذا القسم."
+                            : "No modules available yet in this category."}
+                    </p>
+                </div>
+            )
+        }
+    </main>
+</GlobalLayout>
+
+<style>
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2, 0.5rem);
+        font-size: var(--text-xs, 0.75rem);
+        font-family: var(--font-mono, monospace);
+        font-weight: 500;
+        color: var(--text-muted, #6b7280);
+        text-decoration: none;
+        padding: 0.35rem 0.6rem;
+        margin-inline-start: -0.6rem;
+        border-radius: var(--radius-sm, 6px);
+        transition:
+            color 120ms ease,
+            background-color 120ms ease;
+    }
+
+    .back-link:hover {
+        color: var(--text-primary, #f9fafb);
+        background-color: var(--bg-surface-hover, #1f293d);
+    }
+
+    .back-icon {
+        flex-shrink: 0;
+        transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    :global([dir="ltr"]) .back-link:hover .back-icon {
+        transform: translateX(-3px);
+    }
+
+    :global([dir="rtl"]) .back-icon {
+        transform: rotate(180deg);
+    }
+
+    :global([dir="rtl"]) .back-link:hover .back-icon {
+        transform: rotate(180deg) translateX(-3px);
+    }
+
+    .collection-header {
+        margin-block: var(--space-4, 1rem) var(--space-2, 0.5rem);
+    }
+
+    .header-meta {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2, 0.5rem);
+        margin-block-end: var(--space-2, 0.5rem);
+    }
+
+    .type-pill {
+        font-size: var(--text-xs, 0.75rem);
+        font-family: var(--font-mono, monospace);
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 0.15rem 0.5rem;
+        border-radius: var(--radius-sm, 6px);
+    }
+
+    .pill-lessons {
+        background: var(--accent-subtle);
+        color: var(--accent);
+    }
+
+    .pill-challenges {
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+    }
+
+    .pill-projects {
+        background: rgba(245, 158, 11, 0.12);
+        color: #f59e0b;
+    }
+
+    .track-name-badge {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-muted);
+        font-family: var(--font-mono, monospace);
+    }
+
+    .collection-desc {
+        color: var(--text-secondary);
+        font-size: var(--text-sm, 0.875rem);
+        max-width: 60ch;
+    }
+
+    /* List & Rows */
+    .item-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        margin-block-start: var(--space-6, 1.5rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3, 0.75rem);
+    }
+
+    .item-row {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md, 10px);
+        transition:
+            background-color 120ms ease,
+            border-color 120ms ease,
+            transform 120ms ease;
+    }
+
+    .item-row:hover {
+        background: var(--bg-surface-hover);
+        border-color: var(--border-strong);
+        transform: translateY(-1px);
+    }
+
+    .item-link {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4, 1rem);
+        padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    /* Status / Index Badge */
+    .status-box {
+        flex-shrink: 0;
+        width: 2rem;
+        height: 2rem;
+        border-radius: var(--radius-sm, 6px);
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border-subtle);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono, monospace);
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 600;
+        color: var(--text-muted);
+        transition: all 150ms ease;
+    }
+
+    .check-icon {
+        display: none;
+        color: #ffffff;
+    }
+
+    .item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .item-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-2, 0.5rem);
+    }
+
+    .item-title {
+        color: var(--text-primary);
+        font-size: var(--text-base, 1rem);
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+
+    .item-duration {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-muted);
+        font-family: var(--font-mono, monospace);
+    }
+
+    .item-desc {
+        color: var(--text-secondary);
+        font-size: var(--text-sm, 0.875rem);
+        margin-block-start: 0.2rem;
+        line-height: 1.5;
+    }
+
+    .row-arrow {
+        color: var(--text-muted);
+        font-size: var(--text-sm, 0.875rem);
+        transition:
+            transform 120ms ease,
+            color 120ms ease;
+    }
+
+    .item-row:hover .row-arrow {
+        color: var(--text-primary);
+    }
+
+    :global([dir="ltr"]) .item-row:hover .row-arrow {
+        transform: translateX(3px);
+    }
+
+    :global([dir="rtl"]) .row-arrow {
+        transform: rotate(180deg);
+    }
+
+    :global([dir="rtl"]) .item-row:hover .row-arrow {
+        transform: rotate(180deg) translateX(3px);
+    }
+
+    /* Completed Status Modifiers */
+    .item-row.is-completed {
+        border-color: var(--accent-subtle);
+    }
+
+    .item-row.is-completed .status-box {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #ffffff;
+    }
+
+    .item-row.is-completed .index-num {
+        display: none;
+    }
+
+    .item-row.is-completed .check-icon {
+        display: block;
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: var(--space-12, 3rem) var(--space-4, 1rem);
+        text-align: center;
+        color: var(--text-muted);
+        background: var(--bg-surface);
+        border: 1px dashed var(--border-subtle);
+        border-radius: var(--radius-md, 10px);
+        margin-block-start: var(--space-6, 1.5rem);
+    }
+</style>
+
+<script>
+    import {
+        userDataStore,
+        isItemCompleted,
+    } from "../../../../stores/userStore";
+
+    function syncCompletionBadges() {
+        const rows = document.querySelectorAll<HTMLElement>(".item-row");
+        rows.forEach((row) => {
+            const key = row.dataset.itemKey;
+            if (!key) return;
+
+            const completed = isItemCompleted(key);
+            row.classList.toggle("is-completed", completed);
+        });
+    }
+
+    syncCompletionBadges();
+    userDataStore.listen(syncCompletionBadges);
+    document.addEventListener("astro:after-swap", syncCompletionBadges);
+</script>

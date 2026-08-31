@@ -1,0 +1,320 @@
+---
+// src/components/NavIsland.astro
+import type { NavigationResult } from "../utils/navigation";
+import { useTranslations } from "../i18n/utils";
+import CompletionToggle from "./CompletionToggle.astro";
+
+interface Props {
+    nav: NavigationResult;
+    context: "collection" | "roadmap";
+    track: string;
+    type: string;
+    slug: string;
+    locale: string;
+}
+
+const { nav, context, track, type, slug, locale } = Astro.props;
+const { t } = useTranslations(locale);
+---
+
+<nav class="nav-island" aria-label={t("nav.ariaLabel") || "Lesson Navigation"}>
+    <!-- Top Meta Bar: Parent Back Link + Step Indicator -->
+    <div class="nav-island-top">
+        <a href={nav.parentUrl} class="parent-back-link">
+            <svg
+                class="back-arrow-icon"
+                viewBox="0 0 24 24"
+                width="15"
+                height="15"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+            >
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span class="back-text">
+                {
+                    t("nav.backToParent", {
+                        parent: nav.parentLabel
+                            ? nav.parentLabel.charAt(0).toUpperCase() +
+                              nav.parentLabel.slice(1).toLowerCase()
+                            : "",
+                    }) ||
+                        `Back to ${
+                            nav.parentLabel
+                                ? nav.parentLabel.charAt(0).toUpperCase() +
+                                  nav.parentLabel.slice(1).toLowerCase()
+                                : ""
+                        }`
+                }
+            </span>
+        </a>
+
+        {
+            context === "roadmap" && nav.currentStep && nav.totalSteps && (
+                <span class="step-badge">
+                    {t("nav.stepOf", {
+                        current: nav.currentStep,
+                        total: nav.totalSteps,
+                    }) || `Step ${nav.currentStep} of ${nav.totalSteps}`}
+                </span>
+            )
+        }
+    </div>
+
+    <!-- Main Controls: Prev | Completion Button | Next -->
+    <div class="nav-island-controls">
+        <div class="nav-slot nav-slot-prev">
+            {
+                nav.prev ? (
+                    <a href={nav.prev.url} class="nav-card prev">
+                        <span class="nav-label">
+                            <span class="arrow-glyph" aria-hidden="true">
+                                &larr;
+                            </span>
+                            <span>{t("nav.previous") || "Previous"}</span>
+                        </span>
+                        <span class="nav-item-title">{nav.prev.title}</span>
+                    </a>
+                ) : (
+                    <div class="nav-placeholder" />
+                )
+            }
+        </div>
+
+        <div class="nav-slot nav-slot-center">
+            <CompletionToggle
+                track={track}
+                type={type}
+                slug={slug}
+                locale={locale}
+            />
+        </div>
+
+        <div class="nav-slot nav-slot-next">
+            {
+                nav.next ? (
+                    <a href={nav.next.url} class="nav-card next">
+                        <span class="nav-label">
+                            <span>{t("nav.next") || "Next"}</span>
+                            <span class="arrow-glyph" aria-hidden="true">
+                                &rarr;
+                            </span>
+                        </span>
+                        <span class="nav-item-title">{nav.next.title}</span>
+                    </a>
+                ) : (
+                    <div class="nav-placeholder" />
+                )
+            }
+        </div>
+    </div>
+</nav>
+
+<style>
+    .nav-island {
+        margin-block-start: var(--space-12, 3rem);
+        padding-block-start: var(--space-6, 1.5rem);
+        border-block-start: 1px solid var(--border-subtle);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4, 1rem);
+    }
+
+    .nav-island-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-2, 0.5rem);
+    }
+
+    /* Specific Parent Back Link Pill Styles with High Specificity */
+    .nav-island .nav-island-top a.parent-back-link,
+    a.parent-back-link {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        font-size: var(--text-xs, 0.8125rem) !important;
+        font-family: var(--font-mono, ui-monospace, monospace) !important;
+        font-weight: 500 !important;
+        line-height: 1 !important;
+        color: var(--text-muted, #94a3b8) !important;
+        text-decoration: none !important;
+        border-bottom: none !important;
+        background-color: var(--bg-surface, #111827) !important;
+        border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08)) !important;
+        padding: 0.4rem 0.75rem !important;
+        border-radius: var(--radius-sm, 6px) !important;
+        transition: all 120ms ease !important;
+        cursor: pointer !important;
+    }
+
+    .nav-island .nav-island-top a.parent-back-link:hover,
+    a.parent-back-link:hover {
+        color: var(--text-primary, #ffffff) !important;
+        background-color: var(--bg-surface-hover, #1e293b) !important;
+        border-color: var(--border-strong, rgba(255, 255, 255, 0.2)) !important;
+        text-decoration: none !important;
+    }
+
+    .back-arrow-icon {
+        flex-shrink: 0;
+        display: block;
+        transition: transform 150ms ease;
+    }
+
+    .back-text {
+        display: inline-block;
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+
+    :global([dir="ltr"]) a.parent-back-link:hover .back-arrow-icon {
+        transform: translateX(-3px);
+    }
+
+    :global([dir="rtl"]) .back-arrow-icon {
+        transform: rotate(180deg);
+    }
+
+    :global([dir="rtl"]) a.parent-back-link:hover .back-arrow-icon {
+        transform: rotate(180deg) translateX(-3px);
+    }
+
+    /* Step Badge */
+    .step-badge {
+        font-size: var(--text-xs, 0.75rem);
+        font-family: var(--font-mono, monospace);
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border-subtle);
+        padding: 0.25rem 0.6rem;
+        border-radius: var(--radius-sm, 6px);
+        color: var(--text-secondary);
+    }
+
+    /* Main Controls Container */
+    .nav-island-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4, 1rem);
+    }
+
+    .nav-slot {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .nav-slot-center {
+        flex: 0 0 auto;
+        display: flex;
+        justify-content: center;
+    }
+
+    .nav-slot-next {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    /* Nav Directional Cards */
+    .nav-card {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1, 0.25rem);
+        padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md, 10px);
+        color: inherit;
+        text-decoration: none;
+        min-width: 140px;
+        max-width: 260px;
+        width: 100%;
+        transition:
+            background-color 120ms ease,
+            border-color 120ms ease,
+            transform 120ms ease;
+    }
+
+    .nav-card:hover {
+        background: var(--bg-surface-hover);
+        border-color: var(--border-strong);
+        transform: translateY(-1px);
+    }
+
+    .nav-card.next {
+        align-items: flex-end;
+        text-align: end;
+    }
+
+    .nav-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .arrow-glyph {
+        display: inline-block;
+        transition: transform 120ms ease;
+    }
+
+    :global([dir="ltr"]) .nav-card.prev:hover .arrow-glyph {
+        transform: translateX(-3px);
+    }
+
+    :global([dir="ltr"]) .nav-card.next:hover .arrow-glyph {
+        transform: translateX(3px);
+    }
+
+    :global([dir="rtl"]) .arrow-glyph {
+        transform: rotate(180deg);
+    }
+
+    :global([dir="rtl"]) .nav-card.prev:hover .arrow-glyph {
+        transform: rotate(180deg) translateX(3px);
+    }
+
+    :global([dir="rtl"]) .nav-card.next:hover .arrow-glyph {
+        transform: rotate(180deg) translateX(-3px);
+    }
+
+    .nav-item-title {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    @media (max-width: 680px) {
+        .nav-island-controls {
+            flex-direction: column;
+            align-items: stretch;
+            gap: var(--space-3, 0.75rem);
+        }
+
+        .nav-slot-center {
+            order: -1;
+            width: 100%;
+        }
+
+        .nav-card {
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .nav-card.next {
+            align-items: flex-start;
+            text-align: start;
+        }
+    }
+</style>

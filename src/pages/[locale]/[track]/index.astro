@@ -1,0 +1,376 @@
+---
+// src/pages/[locale]/[track]/index.astro
+import { getCollection } from "astro:content";
+
+import GlobalLayout from "../../../layouts/GlobalLayout.astro";
+import TrackProgress from "../../../components/TrackProgress.astro";
+import { supportedLocales, useTranslations } from "../../../i18n/utils";
+import { supportedTracks } from "../../../utils/routes";
+
+export function getStaticPaths() {
+    return supportedLocales.flatMap((locale) =>
+        supportedTracks.map((track) => ({ params: { locale, track } })),
+    );
+}
+
+const { locale, track } = Astro.params;
+const { t } = useTranslations(locale);
+
+const trackCapitalized = track.charAt(0).toUpperCase() + track.slice(1);
+
+const lessons = await getCollection("lessons", (entry) =>
+    entry.id.startsWith(`${locale}/${track}/`),
+);
+const challenges = await getCollection("challenges", (entry) =>
+    entry.id.startsWith(`${locale}/${track}/`),
+);
+const projects = await getCollection("projects", (entry) =>
+    entry.id.startsWith(`${locale}/${track}/`),
+);
+
+const totalItems = lessons.length + challenges.length + projects.length;
+
+const gateways = [
+    {
+        type: "roadmap",
+        badge: t("gateways.roadmap.badge"),
+        isFeatured: true,
+        title: t("sections.roadmap"),
+        desc: t("sections.roadmapDesc"),
+        btnText: t("gateways.roadmap.btnText"),
+        url: `/${locale}/${track}/roadmap`,
+        count: t("dashboard.counts.steps", { count: totalItems }),
+    },
+    {
+        type: "lessons",
+        badge: t("gateways.lessons.badge"),
+        isFeatured: false,
+        title: t("sections.lessons"),
+        desc: t("sections.lessonsDesc"),
+        btnText: t("gateways.lessons.btnText"),
+        url: `/${locale}/${track}/lessons`,
+        count: t("dashboard.counts.lessons", { count: lessons.length }),
+    },
+    {
+        type: "challenges",
+        badge: t("gateways.challenges.badge"),
+        isFeatured: false,
+        title: t("sections.challenges"),
+        desc: t("sections.challengesDesc"),
+        btnText: t("gateways.challenges.btnText"),
+        url: `/${locale}/${track}/challenges`,
+        count: t("dashboard.counts.challenges", { count: challenges.length }),
+    },
+    {
+        type: "projects",
+        badge: t("gateways.projects.badge"),
+        isFeatured: false,
+        title: t("sections.projects"),
+        desc: t("sections.projectsDesc"),
+        btnText: t("gateways.projects.btnText"),
+        url: `/${locale}/${track}/projects`,
+        count: t("dashboard.counts.projects", { count: projects.length }),
+    },
+];
+---
+
+<GlobalLayout
+    title={`dijkstra | ${t("dashboard.title", { track: trackCapitalized })}`}
+    locale={locale}
+    description={t("dashboard.subtitle")}
+>
+    <main class="container">
+        <!-- Top Navigation Bar -->
+        <div class="top-nav-bar">
+            <a href={`/${locale}/tracks`} class="back-link">
+                <svg
+                    class="back-icon"
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                >
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>{t("dashboard.backToTracks")}</span>
+            </a>
+        </div>
+
+        <!-- Header Block -->
+        <header class="dashboard-header">
+            <div class="track-tag">
+                <span class="tag-hash">#</span>
+                <span>{track.toUpperCase()}</span>
+            </div>
+            <h1 class="page-title">
+                {t("dashboard.title", { track: trackCapitalized })}
+            </h1>
+            <p class="dashboard-subtitle">
+                {t("dashboard.subtitle")}
+            </p>
+        </header>
+
+        <!-- Track-wide Progress Metric Bar -->
+        <TrackProgress track={track} totalItems={totalItems} locale={locale} />
+
+        <!-- Gateway Grid -->
+        <div class="gateway-grid">
+            {
+                gateways.map((item) => (
+                    <a
+                        href={item.url}
+                        class:list={[
+                            "gateway-card",
+                            `card-${item.type}`,
+                            { featured: item.isFeatured },
+                        ]}
+                    >
+                        <div class="card-header">
+                            <span class={`gateway-badge badge-${item.type}`}>
+                                {item.badge}
+                            </span>
+                            <span class="gateway-count">{item.count}</span>
+                        </div>
+
+                        <div class="card-content">
+                            <h2 class="gateway-title">{item.title}</h2>
+                            <p class="gateway-desc">{item.desc}</p>
+                        </div>
+
+                        <div class="card-footer">
+                            <span class="gateway-action">
+                                <span>{item.btnText}</span>
+                                <span class="action-arrow" aria-hidden="true">
+                                    &rarr;
+                                </span>
+                            </span>
+                        </div>
+                    </a>
+                ))
+            }
+        </div>
+    </main>
+</GlobalLayout>
+
+<style>
+    .top-nav-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-block-end: var(--space-2, 0.5rem);
+    }
+
+    .dashboard-header {
+        margin-block: var(--space-2, 0.5rem) var(--space-6, 1.5rem);
+    }
+
+    .track-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-family: var(--font-mono, monospace);
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 700;
+        color: var(--accent);
+        background: var(--accent-subtle);
+        padding: 0.2rem 0.5rem;
+        border-radius: var(--radius-sm, 6px);
+        margin-block-end: var(--space-2, 0.5rem);
+    }
+
+    .tag-hash {
+        opacity: 0.7;
+    }
+
+    .page-title {
+        font-size: var(--text-3xl, 2.25rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+        margin-block-end: var(--space-2, 0.5rem);
+    }
+
+    .dashboard-subtitle {
+        color: var(--text-secondary);
+        font-size: var(--text-base, 1rem);
+        max-width: 60ch;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2, 0.5rem);
+        font-size: var(--text-xs, 0.75rem);
+        font-family: var(--font-mono, monospace);
+        font-weight: 500;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.35rem 0.6rem;
+        margin-inline-start: -0.6rem;
+        border-radius: var(--radius-sm, 6px);
+        transition:
+            color 120ms ease,
+            background-color 120ms ease;
+    }
+
+    .back-link:hover {
+        color: var(--text-primary);
+        background-color: var(--bg-surface-hover);
+    }
+
+    .back-icon {
+        flex-shrink: 0;
+        transition: transform 150ms ease;
+    }
+
+    :global([dir="ltr"]) .back-link:hover .back-icon {
+        transform: translateX(-3px);
+    }
+
+    :global([dir="rtl"]) .back-icon {
+        transform: rotate(180deg);
+    }
+
+    :global([dir="rtl"]) .back-link:hover .back-icon {
+        transform: rotate(180deg) translateX(-3px);
+    }
+
+    .gateway-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-4, 1rem);
+        margin-block-start: var(--space-6, 1.5rem);
+    }
+
+    .gateway-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md, 10px);
+        padding: var(--space-6, 1.5rem);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: var(--space-4, 1rem);
+        text-decoration: none;
+        color: inherit;
+        transition:
+            transform 120ms ease,
+            border-color 120ms ease,
+            background-color 120ms ease;
+    }
+
+    .gateway-card:hover {
+        background: var(--bg-surface-hover);
+        border-color: var(--border-strong);
+        transform: translateY(-2px);
+    }
+
+    .gateway-card.featured {
+        border-color: var(--accent);
+        background: linear-gradient(
+            180deg,
+            var(--accent-subtle) 0%,
+            var(--bg-surface) 100%
+        );
+    }
+
+    .gateway-card.featured:hover {
+        background: var(--bg-surface-hover);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .gateway-badge {
+        font-size: var(--text-xs, 0.75rem);
+        font-family: var(--font-mono, monospace);
+        font-weight: 600;
+        padding: 0.15rem 0.5rem;
+        border-radius: var(--radius-sm, 6px);
+    }
+
+    .badge-roadmap {
+        background: var(--accent);
+        color: #ffffff;
+    }
+
+    .badge-lessons {
+        background: var(--accent-subtle);
+        color: var(--accent);
+    }
+
+    .badge-challenges {
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+    }
+
+    .badge-projects {
+        background: rgba(245, 158, 11, 0.12);
+        color: #f59e0b;
+    }
+
+    .gateway-count {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-muted);
+        font-family: var(--font-mono, monospace);
+    }
+
+    .card-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2, 0.5rem);
+    }
+
+    .gateway-title {
+        font-size: var(--text-xl, 1.35rem);
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+    }
+
+    .gateway-desc {
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .card-footer {
+        border-block-start: 1px solid var(--border-subtle);
+        padding-block-start: var(--space-3, 0.75rem);
+    }
+
+    .gateway-action {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2, 0.5rem);
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+        color: var(--accent);
+    }
+
+    .action-arrow {
+        display: inline-block;
+        transition: transform 120ms ease;
+    }
+
+    :global([dir="ltr"]) .gateway-card:hover .action-arrow {
+        transform: translateX(3px);
+    }
+
+    :global([dir="rtl"]) .action-arrow {
+        transform: rotate(180deg);
+    }
+
+    :global([dir="rtl"]) .gateway-card:hover .action-arrow {
+        transform: rotate(180deg) translateX(3px);
+    }
+</style>

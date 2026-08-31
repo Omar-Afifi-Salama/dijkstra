@@ -1,11 +1,198 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+// src/pages/index.astro
+import { supportedLocales } from "../i18n/utils";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const defaultLocale = "en";
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>dijkstra | Initializing</title>
+
+        <!-- 1. Theme sync to prevent background flicker -->
+        <script is:inline>
+            (function () {
+                try {
+                    const raw = localStorage.getItem("user_data");
+                    const theme = raw ? JSON.parse(raw).theme : null;
+                    const prefersDark = window.matchMedia(
+                        "(prefers-color-scheme: dark)",
+                    ).matches;
+                    document.documentElement.setAttribute(
+                        "data-theme",
+                        theme || (prefersDark ? "dark" : "light"),
+                    );
+                } catch {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                }
+            })();
+        </script>
+
+        <!-- 2. Instant client-side locale detection and redirect -->
+        <script is:inline define:vars={{ supportedLocales, defaultLocale }}>
+            (function () {
+                let targetLocale = defaultLocale;
+
+                // Check if user previously chose a language path
+                const lastLocale = localStorage.getItem(
+                    "dijkstra_preferred_locale",
+                );
+                if (lastLocale && supportedLocales.includes(lastLocale)) {
+                    targetLocale = lastLocale;
+                } else {
+                    // Detect from browser settings
+                    const browserLangs = navigator.languages || [
+                        navigator.language || navigator.userLanguage || "",
+                    ];
+
+                    for (const fullLang of browserLangs) {
+                        if (!fullLang) continue;
+                        const lang = fullLang.toLowerCase().split("-")[0];
+                        if (supportedLocales.includes(lang)) {
+                            targetLocale = lang;
+                            break;
+                        }
+                    }
+                }
+
+                // Fast redirect preserving history stack cleanliness
+                window.location.replace("/" + targetLocale);
+            })();
+        </script>
+
+        <!-- 3. Fallback meta refresh for noscript / disabled JS -->
+        <noscript>
+            <meta http-equiv="refresh" content={`0;url=/${defaultLocale}`} />
+        </noscript>
+
+        <style>
+            :root,
+            html[data-theme="dark"] {
+                --bg-page: #0b0f19;
+                --bg-surface: #111827;
+                --border-subtle: rgba(255, 255, 255, 0.08);
+                --text-primary: #f9fafb;
+                --text-muted: #6b7280;
+                --accent: #6366f1;
+            }
+
+            html[data-theme="light"] {
+                --bg-page: #fafafa;
+                --bg-surface: #ffffff;
+                --border-subtle: rgba(0, 0, 0, 0.08);
+                --text-primary: #111827;
+                --text-muted: #9ca3af;
+                --accent: #4f46e5;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background-color: var(--bg-page);
+                color: var(--text-primary);
+                font-family:
+                    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+                    "Liberation Mono", monospace;
+                padding: 1.5rem;
+            }
+
+            .redirect-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+                padding: 2rem;
+                background-color: var(--bg-surface);
+                border: 1px solid var(--border-subtle);
+                border-radius: 12px;
+                max-width: 320px;
+                width: 100%;
+                text-align: center;
+            }
+
+            .brand {
+                font-size: 1.25rem;
+                font-weight: 700;
+                letter-spacing: -0.03em;
+            }
+
+            .brand-cursor {
+                color: var(--accent);
+                animation: blink 1.2s steps(2, start) infinite;
+            }
+
+            .status-line {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.8125rem;
+                color: var(--text-muted);
+            }
+
+            .pulse-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background-color: var(--accent);
+                animation: pulse 1.5s ease-in-out infinite;
+            }
+
+            .manual-link {
+                color: var(--accent);
+                text-decoration: none;
+                font-size: 0.75rem;
+                margin-top: 0.25rem;
+                transition: opacity 120ms ease;
+            }
+
+            .manual-link:hover {
+                opacity: 0.8;
+            }
+
+            @keyframes blink {
+                to {
+                    visibility: hidden;
+                }
+            }
+
+            @keyframes pulse {
+                0%,
+                100% {
+                    opacity: 0.3;
+                    transform: scale(0.85);
+                }
+                50% {
+                    opacity: 1;
+                    transform: scale(1.15);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="redirect-box">
+            <span class="brand"
+                >dijkstra<span class="brand-cursor">_</span></span
+            >
+            <div class="status-line">
+                <span class="pulse-dot" aria-hidden="true"></span>
+                <span>Routing to environment...</span>
+            </div>
+            <noscript>
+                <a class="manual-link" href={`/${defaultLocale}`}
+                    >Click to continue &rarr;</a
+                >
+            </noscript>
+        </div>
+    </body>
+</html>

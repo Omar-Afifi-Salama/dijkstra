@@ -1,0 +1,120 @@
+---
+// src/components/TrackProgress.astro
+import { useTranslations } from "../i18n/utils";
+
+interface Props {
+    track: string;
+    totalItems: number;
+    locale: string;
+}
+
+const { track, totalItems, locale } = Astro.props;
+const { t } = useTranslations(locale);
+---
+
+<div class="track-progress" data-track={track} data-total={totalItems}>
+    <div class="progress-header">
+        <span class="progress-label"
+            >{t("progress.trackProgress") || "Progress"}</span
+        >
+        <span class="progress-stats">
+            <span class="completed-count">0</span> / {totalItems} (<span
+                class="percentage-value">0%</span
+            >)
+        </span>
+    </div>
+
+    <div
+        class="progress-track"
+        role="progressbar"
+        aria-valuenow="0"
+        aria-valuemin="0"
+        aria-valuemax="100"
+    >
+        <div class="progress-fill" style="width: 0%;"></div>
+    </div>
+</div>
+
+<style>
+    .track-progress {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: var(--space-4);
+        margin-block: var(--space-4) var(--space-6);
+    }
+
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: var(--text-xs);
+        font-weight: 500;
+        margin-block-end: var(--space-2);
+    }
+
+    .progress-label {
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .progress-stats {
+        font-family: var(--font-mono, monospace);
+        color: var(--text-primary);
+    }
+
+    .progress-track {
+        height: 6px;
+        width: 100%;
+        background-color: var(--bg-surface-subtle);
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background-color: var(--accent);
+        border-radius: 999px;
+        transition: width 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+</style>
+
+<script>
+    import { userDataStore, getTrackCompletedCount } from "../stores/userStore";
+
+    function setupProgressTrackers() {
+        const trackers =
+            document.querySelectorAll<HTMLElement>(".track-progress");
+
+        function update() {
+            trackers.forEach((el) => {
+                const track = el.dataset.track;
+                const total = parseInt(el.dataset.total || "0", 10);
+                if (!track || !total) return;
+
+                const count = getTrackCompletedCount(track);
+                const percent = Math.min(
+                    100,
+                    Math.round((count / total) * 100),
+                );
+
+                const countSpan = el.querySelector(".completed-count");
+                const percentSpan = el.querySelector(".percentage-value");
+                const fill = el.querySelector<HTMLElement>(".progress-fill");
+                const bar = el.querySelector(".progress-track");
+
+                if (countSpan) countSpan.textContent = String(count);
+                if (percentSpan) percentSpan.textContent = `${percent}%`;
+                if (fill) fill.style.width = `${percent}%`;
+                if (bar) bar.setAttribute("aria-valuenow", String(percent));
+            });
+        }
+
+        update();
+        userDataStore.listen(update);
+    }
+
+    setupProgressTrackers();
+    document.addEventListener("astro:after-swap", setupProgressTrackers);
+</script>

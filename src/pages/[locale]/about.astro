@@ -1,0 +1,497 @@
+---
+// src/pages/[locale]/about.astro
+import GlobalLayout from "../../layouts/GlobalLayout.astro";
+import { supportedLocales, useTranslations } from "../../i18n/utils";
+
+export function getStaticPaths() {
+    return supportedLocales.map((locale) => ({ params: { locale } }));
+}
+
+const { locale } = Astro.params;
+const { t } = useTranslations(locale);
+
+const teamMembers = [
+    {
+        name: t("about.team.members.omar.name"),
+        role: t("about.team.members.omar.role"),
+        bio: t("about.team.members.omar.bio"),
+        avatar: "OA",
+        links: [
+            { label: "GitHub", url: "https://github.com", icon: "github" },
+            {
+                label: "LinkedIn",
+                url: "https://linkedin.com",
+                icon: "linkedin",
+            },
+            {
+                label: "Email",
+                url: "mailto:contact@example.com",
+                icon: "email",
+            },
+        ],
+    },
+    {
+        name: t("about.team.members.core.name"),
+        role: t("about.team.members.core.role"),
+        bio: t("about.team.members.core.bio"),
+        avatar: "DC",
+        links: [
+            { label: "GitHub Org", url: "https://github.com", icon: "github" },
+            { label: "Discord", url: "https://discord.com", icon: "discord" },
+        ],
+    },
+];
+---
+
+<GlobalLayout
+    title={`dijkstra_ | ${t("about.title")}`}
+    locale={locale}
+    description={t("about.subtitle")}
+>
+    <main class="about-page">
+        <!-- Header Section -->
+        <header class="about-header">
+            <div class="header-badge">
+                <span class="badge-dot" aria-hidden="true"></span>
+                <span>{t("about.badge")}</span>
+            </div>
+            <h1 class="page-title">{t("about.title")}</h1>
+            <p class="page-subtitle">{t("about.subtitle")}</p>
+        </header>
+
+        <!-- Mission & Story -->
+        <section class="story-section">
+            <div class="story-card">
+                <span class="section-tag">{t("about.mission.tag")}</span>
+                <h2 class="section-heading">{t("about.mission.title")}</h2>
+                <div class="story-content">
+                    <p>{t("about.mission.p1")}</p>
+                    <p>{t("about.mission.p2")}</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Values Grid -->
+        <section class="values-section">
+            <h2 class="section-heading-centered">{t("about.values.title")}</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <span class="value-index">01</span>
+                    <h3 class="value-title">
+                        {t("about.values.firstPrinciples.title")}
+                    </h3>
+                    <p class="value-desc">
+                        {t("about.values.firstPrinciples.desc")}
+                    </p>
+                </div>
+
+                <div class="value-card">
+                    <span class="value-index">02</span>
+                    <h3 class="value-title">
+                        {t("about.values.localFirst.title")}
+                    </h3>
+                    <p class="value-desc">
+                        {t("about.values.localFirst.desc")}
+                    </p>
+                </div>
+
+                <div class="value-card">
+                    <span class="value-index">03</span>
+                    <h3 class="value-title">
+                        {t("about.values.bilingual.title")}
+                    </h3>
+                    <p class="value-desc">{t("about.values.bilingual.desc")}</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team & Contact Cards -->
+        <section class="team-section">
+            <div class="team-header">
+                <span class="section-tag">{t("about.team.tag")}</span>
+                <h2 class="section-heading">{t("about.team.title")}</h2>
+                <p class="team-subtitle">{t("about.team.subtitle")}</p>
+            </div>
+
+            <div class="team-grid">
+                {
+                    teamMembers.map((member) => (
+                        <div class="member-card">
+                            <div class="member-header">
+                                <div class="member-avatar">{member.avatar}</div>
+                                <div>
+                                    <h3 class="member-name">{member.name}</h3>
+                                    <span class="member-role">
+                                        {member.role}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <p class="member-bio">{member.bio}</p>
+
+                            <div class="member-footer">
+                                <span class="connect-label">
+                                    {t("about.team.connect")}:
+                                </span>
+                                <div class="member-links">
+                                    {member.links.map((link) => (
+                                        <a
+                                            href={link.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="contact-chip"
+                                        >
+                                            {link.icon === "github" && (
+                                                <svg
+                                                    class="chip-icon"
+                                                    viewBox="0 0 24 24"
+                                                    width="14"
+                                                    height="14"
+                                                    fill="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                                                </svg>
+                                            )}
+                                            {link.icon === "linkedin" && (
+                                                <svg
+                                                    class="chip-icon"
+                                                    viewBox="0 0 24 24"
+                                                    width="14"
+                                                    height="14"
+                                                    fill="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+                                                </svg>
+                                            )}
+                                            {link.icon === "email" && (
+                                                <svg
+                                                    class="chip-icon"
+                                                    viewBox="0 0 24 24"
+                                                    width="14"
+                                                    height="14"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    fill="none"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                                    <polyline points="22,6 12,13 2,6" />
+                                                </svg>
+                                            )}
+                                            {link.icon === "discord" && (
+                                                <svg
+                                                    class="chip-icon"
+                                                    viewBox="0 0 24 24"
+                                                    width="14"
+                                                    height="14"
+                                                    fill="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                                                </svg>
+                                            )}
+                                            <span>{link.label}</span>
+                                            <span
+                                                class="chip-arrow"
+                                                aria-hidden="true"
+                                            >
+                                                &nearr;
+                                            </span>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        </section>
+    </main>
+</GlobalLayout>
+
+<style>
+    .about-page {
+        max-width: var(--max-w-layout, 1100px);
+        margin-inline: auto;
+        padding-inline: var(--space-4, 1rem);
+        padding-block: var(--space-8, 2rem) var(--space-16, 4rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-16, 4rem);
+    }
+
+    /* Header */
+    .about-header {
+        text-align: center;
+        max-width: 720px;
+        margin-inline: auto;
+        padding-block-start: var(--space-4, 1rem);
+    }
+
+    .header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2, 0.5rem);
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        padding: 0.2rem 0.65rem;
+        border-radius: 999px;
+        font-size: var(--text-xs, 0.75rem);
+        font-family: var(--font-mono, monospace);
+        color: var(--text-secondary);
+        margin-block-end: var(--space-3, 0.75rem);
+    }
+
+    .badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+    }
+
+    .page-title {
+        font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+        margin-block-end: var(--space-3, 0.75rem);
+    }
+
+    .page-subtitle {
+        font-size: var(--text-base, 1rem);
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* Mission & Story Box */
+    .story-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg, 16px);
+        padding: var(--space-8, 2rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3, 0.75rem);
+    }
+
+    .section-tag {
+        font-size: var(--text-xs, 0.75rem);
+        font-family: var(--font-mono, monospace);
+        color: var(--accent);
+        background: var(--accent-subtle);
+        padding: 0.15rem 0.5rem;
+        border-radius: var(--radius-sm, 6px);
+        font-weight: 600;
+        align-self: flex-start;
+    }
+
+    .section-heading {
+        font-size: var(--text-xl, 1.35rem);
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .section-heading-centered {
+        font-size: var(--text-xl, 1.35rem);
+        font-weight: 700;
+        color: var(--text-primary);
+        text-align: center;
+        margin-block-end: var(--space-6, 1.5rem);
+    }
+
+    .story-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3, 0.75rem);
+        color: var(--text-secondary);
+        line-height: 1.7;
+        font-size: var(--text-base, 1rem);
+    }
+
+    /* Core Values */
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: var(--space-4, 1rem);
+    }
+
+    .value-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md, 10px);
+        padding: var(--space-6, 1.5rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2, 0.5rem);
+    }
+
+    .value-index {
+        font-family: var(--font-mono, monospace);
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-muted);
+        font-weight: 700;
+    }
+
+    .value-title {
+        font-size: var(--text-base, 1rem);
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .value-desc {
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* Team Section */
+    .team-header {
+        margin-block-end: var(--space-6, 1.5rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1, 0.25rem);
+    }
+
+    .team-subtitle {
+        color: var(--text-secondary);
+        font-size: var(--text-sm, 0.875rem);
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: var(--space-4, 1rem);
+    }
+
+    .member-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md, 10px);
+        padding: var(--space-6, 1.5rem);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: var(--space-4, 1rem);
+        transition:
+            border-color 120ms ease,
+            background-color 120ms ease;
+    }
+
+    .member-card:hover {
+        border-color: var(--border-strong);
+        background-color: var(--bg-surface-hover);
+    }
+
+    .member-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3, 0.75rem);
+    }
+
+    .member-avatar {
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 50%;
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border-subtle);
+        color: var(--accent);
+        font-family: var(--font-mono, monospace);
+        font-weight: 700;
+        font-size: var(--text-sm, 0.875rem);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .member-name {
+        font-size: var(--text-base, 1rem);
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.3;
+    }
+
+    .member-role {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-muted);
+    }
+
+    .member-bio {
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .member-footer {
+        border-block-start: 1px solid var(--border-subtle);
+        padding-block-start: var(--space-3, 0.75rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2, 0.5rem);
+    }
+
+    .connect-label {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .member-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2, 0.5rem);
+    }
+
+    .contact-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.3rem 0.65rem;
+        border-radius: var(--radius-sm, 6px);
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border-subtle);
+        font-size: var(--text-xs, 0.75rem);
+        font-family: var(--font-mono, monospace);
+        font-weight: 500;
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: all 120ms ease;
+    }
+
+    .contact-chip:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-subtle);
+    }
+
+    .chip-icon {
+        flex-shrink: 0;
+        opacity: 0.85;
+    }
+
+    .contact-chip:hover .chip-icon {
+        opacity: 1;
+    }
+
+    .chip-arrow {
+        font-size: 0.7rem;
+        opacity: 0.7;
+        transition: transform 120ms ease;
+    }
+
+    .contact-chip:hover .chip-arrow {
+        transform: translate(1px, -1px);
+    }
+
+    :global([dir="rtl"]) .chip-arrow {
+        transform: rotate(-90deg);
+    }
+
+    :global([dir="rtl"]) .contact-chip:hover .chip-arrow {
+        transform: rotate(-90deg) translate(-1px, 1px);
+    }
+</style>

@@ -1,0 +1,151 @@
+---
+import { useTranslations } from "../i18n/utils";
+import { Font } from "astro:assets";
+
+import "../styles/reset.css";
+import "../styles/tokens.css";
+import "../styles/main.css";
+import Header from "../components/Header.astro";
+
+interface Props {
+    title: string;
+    description?: string;
+    locale: string;
+    canonicalUrl?: string;
+    image?: string;
+}
+
+const {
+    title,
+    description = "An independent, local-first developer platform engineered to teach computer science from first principles.",
+    locale,
+    canonicalUrl = Astro.url.pathname,
+    image,
+} = Astro.props;
+
+// Auto-resolve text direction and dictionary from the i18n helper
+const { dir } = useTranslations(locale);
+
+const cleanPath = canonicalUrl.replace(/^\/|\/$/g, "") || `${locale}/index`;
+const siteUrl = Astro.site ? Astro.site.origin : "https://dijkstra.dev";
+const ogImageUrl = image || `${siteUrl}/og/${cleanPath}.png`;
+const fullCanonicalUrl = `${siteUrl}${canonicalUrl.startsWith("/") ? canonicalUrl : `/${canonicalUrl}`}`;
+---
+
+<!doctype html>
+<html lang={locale} dir={dir}>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+        <meta name="generator" content={Astro.generator} />
+
+        <!-- Favicons -->
+        <link
+            rel="icon"
+            type="image/png"
+            href="/favicon-96x96.png"
+            sizes="96x96"
+        />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="/apple-touch-icon.png"
+        />
+        <meta name="apple-mobile-web-app-title" content="MyWebSite" />
+        <link rel="manifest" href="/site.webmanifest" />
+
+        <!-- Open Graph (Facebook, LinkedIn, Discord, GitHub) -->
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="dijkstra_" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={fullCanonicalUrl} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta
+            property="og:locale"
+            content={locale === "ar" ? "ar_AR" : "en_US"}
+        />
+
+        <!-- Twitter Cards (GitHub, X, Telegram) -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={ogImageUrl} />
+
+        <Font cssVariable="--font-fira-code" preload />
+
+        {
+            locale.startsWith("ar") ? (
+                <Font cssVariable="--font-noto-sans-arabic" preload />
+            ) : (
+                <Font cssVariable="--font-ibm-plex-sans" preload />
+            )
+        }
+
+        <script is:inline>
+            (function () {
+                try {
+                    const raw = localStorage.getItem("user_data");
+                    const data = raw ? JSON.parse(raw) : null;
+                    const theme =
+                        data?.theme ||
+                        (window.matchMedia("(prefers-color-scheme: dark)")
+                            .matches
+                            ? "dark"
+                            : "light");
+                    document.documentElement.setAttribute("data-theme", theme);
+                } catch {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                }
+            })();
+        </script>
+
+        <style is:global>
+            /* 1. English / LTR */
+            :root,
+            :root[dir="ltr"],
+            [dir="ltr"] {
+                --font-sans:
+                    var(--font-ibm-plex-sans), system-ui, -apple-system,
+                    sans-serif;
+            }
+
+            /* 2. Arabic / RTL */
+            :root[dir="rtl"],
+            [dir="rtl"],
+            :root[lang="ar"],
+            [lang="ar"] {
+                --font-sans:
+                    var(--font-noto-sans-arabic), system-ui, -apple-system,
+                    sans-serif;
+            }
+
+            /* 3. Base styles */
+            html,
+            body {
+                font-family: var(--font-sans);
+            }
+
+            /* 4. Code blocks */
+            code,
+            pre,
+            kbd,
+            samp {
+                font-family: var(--font-fira-code), monospace;
+                direction: ltr !important;
+                unicode-bidi: isolate;
+            }
+        </style>
+    </head>
+    <body>
+        <Header locale={locale} />
+        <slot />
+    </body>
+</html>
