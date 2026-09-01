@@ -103,6 +103,14 @@ const ogImageUrl = image || `${siteUrl}/og/${cleanSlug}.png`;
             )
         }
 
+        <!-- Vercel Web Analytics Initialization -->
+        <script>
+            import { inject } from "@vercel/analytics";
+
+            // Automatically tracks page views and Core Web Vitals
+            inject();
+        </script>
+
         <script is:inline>
             (function () {
                 try {
