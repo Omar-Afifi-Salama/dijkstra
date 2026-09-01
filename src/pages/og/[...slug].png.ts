@@ -38,16 +38,43 @@ export async function getStaticPaths() {
     for (const locale of supportedLocales) {
         const { t } = useTranslations(locale);
 
-        // 1. Root Platform Overview Banner
-        paths.push({
-            params: { slug: `${locale}/index` },
-            props: {
+        // 1. Root & Standalone Page Banners
+        const staticPages = [
+            {
+                slug: `${locale}/index`,
                 title: "dijkstra_",
                 subtitle: t("og.defaultSubtitle"),
                 badge: t("og.platformBadge"),
-                locale,
             },
-        });
+            {
+                slug: `${locale}/tracks`,
+                title: t("sections.tracksTitle") || "Learning Tracks",
+                subtitle:
+                    t("sections.tracksSubtitle") ||
+                    "Master core computer science tracks.",
+                badge: t("og.platformBadge"),
+            },
+            {
+                slug: `${locale}/about`,
+                title: t("sections.aboutTitle") || "About dijkstra_",
+                subtitle:
+                    t("sections.aboutSubtitle") ||
+                    "Computer science from first principles.",
+                badge: t("og.platformBadge"),
+            },
+        ];
+
+        for (const page of staticPages) {
+            paths.push({
+                params: { slug: page.slug },
+                props: {
+                    title: page.title,
+                    subtitle: page.subtitle,
+                    badge: page.badge,
+                    locale,
+                },
+            });
+        }
 
         // 2. Track Overview Banners
         for (const track of supportedTracks) {
