@@ -1,6 +1,7 @@
+// src/pages/api/callback.ts
 import type { APIRoute } from "astro";
 
-export const prerender = false; // Serverless endpoint
+export const prerender = false;
 
 export const GET: APIRoute = async ({ url }) => {
     const code = url.searchParams.get("code");
@@ -8,11 +9,19 @@ export const GET: APIRoute = async ({ url }) => {
     const clientSecret = import.meta.env.OAUTH_GITHUB_CLIENT_SECRET;
 
     if (!code) {
-        return new Response("Missing authorization code", { status: 400 });
+        return new Response(
+            renderHtml("error", {
+                message: "No authorization code provided by GitHub.",
+            }),
+            {
+                status: 400,
+                headers: { "Content-Type": "text/html; charset=utf-8" },
+            },
+        );
     }
 
     try {
-        const response = await fetch(
+        const tokenResponse = await fetch(
             "https://github.com/login/oauth/access_token",
             {
                 method: "POST",
@@ -28,55 +37,76 @@ export const GET: APIRoute = async ({ url }) => {
             },
         );
 
-        const data = await response.json();
+        const data = await tokenResponse.json();
 
         if (data.error || !data.access_token) {
             return new Response(
-                renderMessage("error", {
-                    message: data.error_description || "Auth failed",
+                renderHtml("error", {
+                    message:
+                        data.error_description ||
+                        data.error ||
+                        "GitHub token exchange failed.",
                 }),
-                { headers: { "Content-Type": "text/html" } },
+                {
+                    status: 200,
+                    headers: { "Content-Type": "text/html; charset=utf-8" },
+                },
             );
         }
 
-        // Decap expects the access token inside a postMessage payload
-        const content = renderMessage("success", {
-            token: data.access_token,
-            provider: "github",
-        });
-
-        return new Response(content, {
-            headers: { "Content-Type": "text/html" },
-        });
+        return new Response(
+            renderHtml("success", {
+                token: data.access_token,
+                provider: "github",
+            }),
+            {
+                status: 200,
+                headers: { "Content-Type": "text/html; charset=utf-8" },
+            },
+        );
     } catch (err: any) {
         return new Response(
-            renderMessage("error", {
-                message: err.message || "Internal server error",
+            renderHtml("error", {
+                message: err?.message || "Internal server error during auth.",
             }),
-            { headers: { "Content-Type": "text/html" } },
+            {
+                status: 200,
+                headers: { "Content-Type": "text/html; charset=utf-8" },
+            },
         );
     }
 };
 
-function renderMessage(
-    status: "success" | "error",
-    content: Record<string, any>,
-) {
+function renderHtml(status: "success" | "error", content: Record<string, any>) {
     return `<!doctype html>
-<html>
-  <body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Authorizing Decap CMS...</title>
+  </head>
+  <body style="font-family: sans-serif; text-align: center; padding-top: 40px; background: #090d16; color: #f3f4f6;">
+    <p>Completing authentication...</p>
     <script>
       (function() {
+        var status = ${JSON.stringify(status)};
+        var content = ${JSON.stringify(content)};
+
         function receiveMessage(e) {
           window.opener.postMessage(
-            'authorization:github:${status}:${JSON.stringify(content)}',
+            'authorization:github:' + status + ':' + JSON.stringify(content),
             e.origin
           );
           window.removeEventListener("message", receiveMessage, false);
           window.close();
         }
+
         window.addEventListener("message", receiveMessage, false);
-        window.opener.postMessage("authorizing:github", "*");
+
+        if (window.opener) {
+          window.opener.postMessage("authorizing:github", "*");
+        } else {
+          document.body.innerHTML = "<p style='color: #ef4444;'>Error: Parent window not found. Please close and try again.</p>";
+        }
       })();
     </script>
   </body>
