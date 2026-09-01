@@ -4,6 +4,7 @@ import react from "@astrojs/react";
 import mdx from "@astrojs/mdx";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import vercel from "@astrojs/vercel";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -11,6 +12,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
     site: "https://dijkstra-coding.vercel.app",
     integrations: [react(), mdx()],
+    adapter: vercel(),
+
     i18n: {
         defaultLocale: "en",
         locales: ["en", "ar"],
@@ -19,6 +22,7 @@ export default defineConfig({
             redirectToDefaultLocale: false,
         },
     },
+
     vite: {
         resolve: {
             alias: {
@@ -26,6 +30,7 @@ export default defineConfig({
             },
         },
     },
+
     fonts: [
         {
             provider: fontProviders.local(),

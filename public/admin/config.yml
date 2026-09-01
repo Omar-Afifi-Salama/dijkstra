@@ -1,0 +1,552 @@
+backend:
+    name: github
+    repo: Omar-Afifi-Salama/dijkstra
+    branch: main
+    base_url: https://dijkstra-coding.vercel.app
+    auth_endpoint: api/auth
+
+local_backend: true
+publish_mode: editorial_workflow
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+# ========================================================
+# COLLECTIONS
+# ========================================================
+collections:
+    # ------------------------------------------------------
+    # 🇬🇧 ENGLISH (EN)
+    # ------------------------------------------------------
+    - name: "en_python_lessons"
+      label: "🇬🇧 [EN] Python › Lessons"
+      folder: "src/content/en/python/lessons"
+      create: true
+      extension: "mdx"
+      format: "frontmatter"
+      slug: "{{fields.order}}-{{fields.slug}}"
+      fields:
+          - {
+                label: "Title",
+                name: "title",
+                widget: "string",
+                pattern: ["^.{1,80}$", "Must be 1-80 characters"],
+            }
+          - {
+                label: "Slug (URL identifier)",
+                name: "slug",
+                widget: "string",
+                pattern:
+                    [
+                        "^[a-z0-9-]+$",
+                        "Must be lowercase alphanumeric and dashes only (e.g. variables-and-types)",
+                    ],
+            }
+          - {
+                label: "Description",
+                name: "description",
+                widget: "string",
+                pattern: ["^.{1,160}$", "Must be 1-160 characters"],
+            }
+          - {
+                label: "Order",
+                name: "order",
+                widget: "number",
+                value_type: "int",
+                min: 1,
+            }
+          - {
+                label: "Estimated Minutes",
+                name: "estimatedMinutes",
+                widget: "number",
+                value_type: "int",
+                min: 1,
+                required: false,
+            }
+          - {
+                label: "Authors",
+                name: "authors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Contributors",
+                name: "contributors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Translated By",
+                name: "translatedBy",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Tags",
+                name: "tags",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Updated At",
+                name: "updatedAt",
+                widget: "datetime",
+                format: "YYYY-MM-DDTHH:mm:ssZ",
+                date_format: "YYYY-MM-DD",
+                time_format: "HH:mm",
+            }
+          - {
+                label: "Canonical URL",
+                name: "canonicalUrl",
+                widget: "string",
+                required: false,
+            }
+          - { label: "Body", name: "body", widget: "markdown" }
+
+    - name: "en_python_challenges"
+      label: "🇬🇧 [EN] Python › Challenges"
+      folder: "src/content/en/python/challenges"
+      create: true
+      extension: "mdx"
+      format: "frontmatter"
+      slug: "{{fields.order}}-{{fields.slug}}"
+      fields:
+          - {
+                label: "Title",
+                name: "title",
+                widget: "string",
+                pattern: ["^.{1,80}$", "Must be 1-80 characters"],
+            }
+          - {
+                label: "Slug (URL identifier)",
+                name: "slug",
+                widget: "string",
+                pattern:
+                    [
+                        "^[a-z0-9-]+$",
+                        "Must be lowercase alphanumeric and dashes only",
+                    ],
+            }
+          - {
+                label: "Description",
+                name: "description",
+                widget: "string",
+                pattern: ["^.{1,160}$", "Must be 1-160 characters"],
+            }
+          - {
+                label: "Order",
+                name: "order",
+                widget: "number",
+                value_type: "int",
+                min: 1,
+            }
+          - {
+                label: "Difficulty",
+                name: "difficulty",
+                widget: "select",
+                options: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+                default: "1",
+            }
+          - {
+                label: "Authors",
+                name: "authors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Contributors",
+                name: "contributors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Translated By",
+                name: "translatedBy",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Tags",
+                name: "tags",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Updated At",
+                name: "updatedAt",
+                widget: "datetime",
+                format: "YYYY-MM-DDTHH:mm:ssZ",
+                date_format: "YYYY-MM-DD",
+                time_format: "HH:mm",
+            }
+          - {
+                label: "Canonical URL",
+                name: "canonicalUrl",
+                widget: "string",
+                required: false,
+            }
+          - { label: "Body", name: "body", widget: "markdown" }
+
+    - name: "en_python_projects"
+      label: "🇬🇧 [EN] Python › Projects"
+      folder: "src/content/en/python/projects"
+      create: true
+      extension: "mdx"
+      format: "frontmatter"
+      slug: "{{fields.order}}-{{fields.slug}}"
+      fields:
+          - {
+                label: "Title",
+                name: "title",
+                widget: "string",
+                pattern: ["^.{1,80}$", "Must be 1-80 characters"],
+            }
+          - {
+                label: "Slug (URL identifier)",
+                name: "slug",
+                widget: "string",
+                pattern:
+                    [
+                        "^[a-z0-9-]+$",
+                        "Must be lowercase alphanumeric and dashes only",
+                    ],
+            }
+          - {
+                label: "Description",
+                name: "description",
+                widget: "string",
+                pattern: ["^.{1,160}$", "Must be 1-160 characters"],
+            }
+          - {
+                label: "Order",
+                name: "order",
+                widget: "number",
+                value_type: "int",
+                min: 1,
+            }
+          - {
+                label: "Difficulty",
+                name: "difficulty",
+                widget: "select",
+                options: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+                default: "1",
+            }
+          - {
+                label: "Authors",
+                name: "authors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Contributors",
+                name: "contributors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Translated By",
+                name: "translatedBy",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Tags",
+                name: "tags",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "Updated At",
+                name: "updatedAt",
+                widget: "datetime",
+                format: "YYYY-MM-DDTHH:mm:ssZ",
+                date_format: "YYYY-MM-DD",
+                time_format: "HH:mm",
+            }
+          - {
+                label: "Canonical URL",
+                name: "canonicalUrl",
+                widget: "string",
+                required: false,
+            }
+          - { label: "Body", name: "body", widget: "markdown" }
+
+    # ------------------------------------------------------
+    # 🇪🇬 ARABIC (AR)
+    # ------------------------------------------------------
+    - name: "ar_python_lessons"
+      label: "🇪🇬 [AR] بايثون › الدروس"
+      folder: "src/content/ar/python/lessons"
+      create: true
+      extension: "mdx"
+      format: "frontmatter"
+      slug: "{{fields.order}}-{{fields.slug}}"
+      fields:
+          - {
+                label: "العنوان",
+                name: "title",
+                widget: "string",
+                pattern: ["^.{1,80}$", "يجب أن يتراوح بين 1 و 80 حرفاً"],
+            }
+          - {
+                label: "المعرف الإنجليزي للملف (English Slug)",
+                name: "slug",
+                widget: "string",
+                pattern:
+                    [
+                        "^[a-z0-9-]+$",
+                        "يجب أن يتكون من أحرف إنجليزية صغيرة وأرقام وشرطات فقط مثل variables-and-types",
+                    ],
+            }
+          - {
+                label: "الوصف",
+                name: "description",
+                widget: "string",
+                pattern: ["^.{1,160}$", "يجب أن يتراوح بين 1 و 160 حرفاً"],
+            }
+          - {
+                label: "الترتيب",
+                name: "order",
+                widget: "number",
+                value_type: "int",
+                min: 1,
+            }
+          - {
+                label: "الوقت المقدر (بالدقائق)",
+                name: "estimatedMinutes",
+                widget: "number",
+                value_type: "int",
+                min: 1,
+                required: false,
+            }
+          - {
+                label: "المؤلفون",
+                name: "authors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "المساهمون",
+                name: "contributors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "المترجمون",
+                name: "translatedBy",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "الوسوم",
+                name: "tags",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "تاريخ التحديث",
+                name: "updatedAt",
+                widget: "datetime",
+                format: "YYYY-MM-DDTHH:mm:ssZ",
+                date_format: "YYYY-MM-DD",
+                time_format: "HH:mm",
+            }
+          - {
+                label: "الرابط الأصلي",
+                name: "canonicalUrl",
+                widget: "string",
+                required: false,
+            }
+          - { label: "المحتوى", name: "body", widget: "markdown" }
+
+    - name: "ar_python_challenges"
+      label: "🇪🇬 [AR] بايثون › التحديات"
+      folder: "src/content/ar/python/challenges"
+      create: true
+      extension: "mdx"
+      format: "frontmatter"
+      slug: "{{fields.order}}-{{fields.slug}}"
+      fields:
+          - {
+                label: "العنوان",
+                name: "title",
+                widget: "string",
+                pattern: ["^.{1,80}$", "يجب أن يتراوح بين 1 و 80 حرفاً"],
+            }
+          - {
+                label: "المعرف الإنجليزي للملف (English Slug)",
+                name: "slug",
+                widget: "string",
+                pattern:
+                    [
+                        "^[a-z0-9-]+$",
+                        "يجب أن يتكون من أحرف إنجليزية صغيرة وأرقام وشرطات فقط",
+                    ],
+            }
+          - {
+                label: "الوصف",
+                name: "description",
+                widget: "string",
+                pattern: ["^.{1,160}$", "يجب أن يتراوح بين 1 و 160 حرفاً"],
+            }
+          - {
+                label: "الترتيب",
+                name: "order",
+                widget: "number",
+                value_type: "int",
+                min: 1,
+            }
+          - {
+                label: "مستوى الصعوبة",
+                name: "difficulty",
+                widget: "select",
+                options: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+                default: "1",
+            }
+          - {
+                label: "المؤلفون",
+                name: "authors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "المساهمون",
+                name: "contributors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "المترجمون",
+                name: "translatedBy",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "الوسوم",
+                name: "tags",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "تاريخ التحديث",
+                name: "updatedAt",
+                widget: "datetime",
+                format: "YYYY-MM-DDTHH:mm:ssZ",
+                date_format: "YYYY-MM-DD",
+                time_format: "HH:mm",
+            }
+          - {
+                label: "الرابط الأصلي",
+                name: "canonicalUrl",
+                widget: "string",
+                required: false,
+            }
+          - { label: "المحتوى", name: "body", widget: "markdown" }
+
+    - name: "ar_python_projects"
+      label: "🇪🇬 [AR] بايثون › المشاريع"
+      folder: "src/content/ar/python/projects"
+      create: true
+      extension: "mdx"
+      format: "frontmatter"
+      slug: "{{fields.order}}-{{fields.slug}}"
+      fields:
+          - {
+                label: "العنوان",
+                name: "title",
+                widget: "string",
+                pattern: ["^.{1,80}$", "يجب أن يتراوح بين 1 و 80 حرفاً"],
+            }
+          - {
+                label: "المعرف الإنجليزي للملف (English Slug)",
+                name: "slug",
+                widget: "string",
+                pattern:
+                    [
+                        "^[a-z0-9-]+$",
+                        "يجب أن يتكون من أحرف إنجليزية صغيرة وأرقام وشرطات فقط",
+                    ],
+            }
+          - {
+                label: "الوصف",
+                name: "description",
+                widget: "string",
+                pattern: ["^.{1,160}$", "يجب أن يتراوح بين 1 و 160 حرفاً"],
+            }
+          - {
+                label: "الترتيب",
+                name: "order",
+                widget: "number",
+                value_type: "int",
+                min: 1,
+            }
+          - {
+                label: "مستوى الصعوبة",
+                name: "difficulty",
+                widget: "select",
+                options: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+                default: "1",
+            }
+          - {
+                label: "المؤلفون",
+                name: "authors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "المساهمون",
+                name: "contributors",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "المترجمون",
+                name: "translatedBy",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "الوسوم",
+                name: "tags",
+                widget: "list",
+                required: false,
+                default: [],
+            }
+          - {
+                label: "تاريخ التحديث",
+                name: "updatedAt",
+                widget: "datetime",
+                format: "YYYY-MM-DDTHH:mm:ssZ",
+                date_format: "YYYY-MM-DD",
+                time_format: "HH:mm",
+            }
+          - {
+                label: "الرابط الأصلي",
+                name: "canonicalUrl",
+                widget: "string",
+                required: false,
+            }
+          - { label: "المحتوى", name: "body", widget: "markdown" }
