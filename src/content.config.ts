@@ -18,7 +18,10 @@ const baseSchema = z.object({
 });
 
 const lessons = defineCollection({
-    loader: glob({ base: "./src/content", pattern: "**/**/lessons/*.md" }),
+    loader: glob({
+        base: "./src/content",
+        pattern: "**/**/lessons/*.{md,mdx}",
+    }),
     schema: baseSchema.extend({
         estimatedMinutes: z.number().positive().optional(),
     }),
@@ -27,7 +30,7 @@ const lessons = defineCollection({
 const challenges = defineCollection({
     loader: glob({
         base: "./src/content",
-        pattern: "**/**/challenges/*.md",
+        pattern: "**/**/challenges/*.{md,mdx}",
     }),
     schema: baseSchema.extend({
         difficulty: z.enum(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
@@ -37,7 +40,7 @@ const challenges = defineCollection({
 const projects = defineCollection({
     loader: glob({
         base: "./src/content",
-        pattern: "**/**/projects/*.md",
+        pattern: "**/**/projects/*.{md,mdx}",
     }),
     schema: baseSchema.extend({
         difficulty: z.enum(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),

@@ -1,5 +1,5 @@
 import { getCollection } from "astro:content";
-import { roadmaps, type Track, type ContentType } from "../data/roadmaps";
+import { roadmaps, type Track, type ContentType } from "@/data/roadmaps";
 
 export const supportedTracks = Object.keys(roadmaps) as Track[];
 

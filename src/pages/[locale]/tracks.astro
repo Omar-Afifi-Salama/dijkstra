@@ -1,8 +1,8 @@
 ---
 // src/pages/[locale]/tracks.astro
-import GlobalLayout from "../../layouts/GlobalLayout.astro";
-import { supportedLocales, useTranslations } from "../../i18n/utils";
-import { supportedTracks } from "../../utils/routes";
+import GlobalLayout from "@/layouts/GlobalLayout.astro";
+import { supportedLocales, useTranslations } from "@/i18n/utils";
+import { supportedTracks } from "@/utils/routes";
 import { getCollection } from "astro:content";
 
 export function getStaticPaths() {
@@ -57,13 +57,14 @@ const trackStats = supportedTracks.map((track) => {
         trackStats.map(({ track, total }) => {
           const trackKey = track.toLowerCase();
           const desc = t(`tracks.descriptions.${trackKey}`) || "";
+          const trackCapitalized = track.charAt(0).toUpperCase() + track.slice(1).toLowerCase();
 
           return (
             <a href={`/${locale}/${track}`} class="track-card" data-track={track} data-total={total}>
               <div class="card-top">
                 <div class="track-badge">
                   <span class="track-icon">#</span>
-                  <span class="track-name">{track.toUpperCase()}</span>
+                  <span class="track-name">{trackCapitalized}</span>
                 </div>
                 <span class="track-count">
                   {total} {locale === "ar" ? "وحدة" : "units"}
@@ -71,7 +72,7 @@ const trackStats = supportedTracks.map((track) => {
               </div>
 
               <div class="card-body">
-                <h2 class="card-title">{track.toUpperCase()}</h2>
+                <h2 class="card-title">{trackCapitalized}</h2>
                 {desc && <p class="card-desc">{desc}</p>}
               </div>
 

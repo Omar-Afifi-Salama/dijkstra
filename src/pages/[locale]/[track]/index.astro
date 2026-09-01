@@ -2,10 +2,10 @@
 // src/pages/[locale]/[track]/index.astro
 import { getCollection } from "astro:content";
 
-import GlobalLayout from "../../../layouts/GlobalLayout.astro";
-import TrackProgress from "../../../components/TrackProgress.astro";
-import { supportedLocales, useTranslations } from "../../../i18n/utils";
-import { supportedTracks } from "../../../utils/routes";
+import GlobalLayout from "@/layouts/GlobalLayout.astro";
+import TrackProgress from "@/components/TrackProgress.astro";
+import { supportedLocales, useTranslations } from "@/i18n/utils";
+import { supportedTracks } from "@/utils/routes";
 
 export function getStaticPaths() {
     return supportedLocales.flatMap((locale) =>

@@ -1,12 +1,12 @@
 ---
 // src/pages/[locale]/[track]/roadmap/index.astro
-import { supportedLocales, useTranslations } from "../../../../i18n/utils";
-import { supportedTracks } from "../../../../utils/routes";
-import { getTrackRoadmap } from "../../../../utils/roadmapResolver";
-import type { Track } from "../../../../data/roadmaps";
-import GlobalLayout from "../../../../layouts/GlobalLayout.astro";
-import TrackProgress from "../../../../components/TrackProgress.astro";
-import { createItemKey } from "../../../../stores/userStore";
+import { supportedLocales, useTranslations } from "@/i18n/utils";
+import { supportedTracks } from "@/utils/routes";
+import { getTrackRoadmap } from "@/utils/roadmapResolver";
+import type { Track } from "@/data/roadmaps";
+import GlobalLayout from "@/layouts/GlobalLayout.astro";
+import TrackProgress from "@/components/TrackProgress.astro";
+import { createItemKey } from "@/stores/userStore";
 
 export function getStaticPaths() {
   return supportedLocales.flatMap((locale) =>

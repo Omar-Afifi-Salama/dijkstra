@@ -1,7 +1,7 @@
 ---
 // src/pages/[locale]/about.astro
-import GlobalLayout from "../../layouts/GlobalLayout.astro";
-import { supportedLocales, useTranslations } from "../../i18n/utils";
+import GlobalLayout from "@/layouts/GlobalLayout.astro";
+import { supportedLocales, useTranslations } from "@/i18n/utils";
 
 export function getStaticPaths() {
     return supportedLocales.map((locale) => ({ params: { locale } }));

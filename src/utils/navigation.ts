@@ -1,5 +1,5 @@
 import { getCollection, type CollectionEntry } from "astro:content";
-import { roadmaps, type Track, type ContentType } from "../data/roadmaps";
+import { roadmaps, type Track, type ContentType } from "@/data/roadmaps";
 
 export interface NavLink {
     title: string;

@@ -1,12 +1,12 @@
 ---
 // src/pages/[locale]/[track]/[type]/index.astro
 import { getCollection } from "astro:content";
-import { supportedLocales, useTranslations } from "../../../../i18n/utils";
-import { supportedTracks } from "../../../../utils/routes";
-import type { ContentType } from "../../../../data/roadmaps";
-import GlobalLayout from "../../../../layouts/GlobalLayout.astro";
-import TypeProgress from "../../../../components/TypeProgress.astro";
-import { createItemKey } from "../../../../stores/userStore";
+import { supportedLocales, useTranslations } from "@/i18n/utils";
+import { supportedTracks } from "@/utils/routes";
+import type { ContentType } from "@/data/roadmaps";
+import GlobalLayout from "@/layouts/GlobalLayout.astro";
+import TypeProgress from "@/components/TypeProgress.astro";
+import { createItemKey } from "@/stores/userStore";
 
 export function getStaticPaths() {
     const types: ContentType[] = ["lessons", "challenges", "projects"];

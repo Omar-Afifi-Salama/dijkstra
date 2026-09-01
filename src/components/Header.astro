@@ -2,7 +2,8 @@
 // src/components/Header.astro
 import ThemeSelector from "./ThemeSelector.astro";
 import LanguageSelector from "./LanguageSelector.astro";
-import { useTranslations } from "../i18n/utils";
+import UserNavStatus from "./user/UserNavStatus";
+import { useTranslations } from "@/i18n/utils";
 
 interface Props {
     locale: string;
@@ -15,8 +16,14 @@ const pathname = new URL(Astro.request.url).pathname;
 const navItems = [
     { label: t("nav.home") || "Home", href: `/${locale}` },
     { label: t("nav.tracks") || "Tracks", href: `/${locale}/tracks` },
+    { label: t("nav.profile") || "Profile", href: `/${locale}/profile` },
     { label: t("nav.about") || "About", href: `/${locale}/about` },
 ];
+
+const statusTranslations = {
+    streak: t("nav.streak") || "Days Streak",
+    bookmarks: t("nav.bookmarks") || "Bookmarks",
+};
 ---
 
 <header class="site-header">
@@ -80,6 +87,12 @@ const navItems = [
 
         <!-- Desktop Controls -->
         <div class="nav-actions desktop-only">
+            <UserNavStatus
+                client:load
+                locale={locale}
+                translations={statusTranslations}
+            />
+            <div class="divider" aria-hidden="true"></div>
             <LanguageSelector locale={locale} />
             <ThemeSelector />
         </div>
@@ -121,6 +134,15 @@ const navItems = [
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
+        </div>
+
+        <!-- Mobile User Stats Section -->
+        <div class="drawer-stats">
+            <UserNavStatus
+                client:load
+                locale={locale}
+                translations={statusTranslations}
+            />
         </div>
 
         <!-- Drawer Nav Links -->
@@ -240,6 +262,13 @@ const navItems = [
         gap: var(--space-2, 0.5rem);
     }
 
+    .divider {
+        width: 1px;
+        height: 1.25rem;
+        background-color: var(--border-subtle);
+        margin-inline: var(--space-1, 0.25rem);
+    }
+
     /* Hamburger & Close Buttons */
     .mobile-toggle,
     .close-button {
@@ -309,12 +338,17 @@ const navItems = [
         border-block-end: 1px solid var(--border-subtle);
     }
 
+    .drawer-stats {
+        padding-block: var(--space-3, 0.75rem);
+        border-block-end: 1px solid var(--border-subtle);
+    }
+
     .drawer-links {
         list-style: none;
         display: flex;
         flex-direction: column;
         gap: var(--space-2, 0.5rem);
-        margin-block-start: var(--space-4, 1rem);
+        margin-block-start: var(--space-3, 0.75rem);
         flex: 1;
         padding-inline-start: 0;
     }

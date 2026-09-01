@@ -1,18 +1,29 @@
 // @ts-check
 import { defineConfig, fontProviders } from "astro/config";
-
 import react from "@astrojs/react";
+import mdx from "@astrojs/mdx";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
     site: "https://dijkstra-coding.vercel.app",
-    integrations: [react()],
+    integrations: [react(), mdx()],
     i18n: {
         defaultLocale: "en",
         locales: ["en", "ar"],
         routing: {
             prefixDefaultLocale: true,
             redirectToDefaultLocale: false,
+        },
+    },
+    vite: {
+        resolve: {
+            alias: {
+                "@": path.resolve(__dirname, "./src"),
+            },
         },
     },
     fonts: [

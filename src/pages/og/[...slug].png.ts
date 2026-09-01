@@ -4,8 +4,8 @@ import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { getAllCurriculumEntries, supportedTracks } from "../../utils/routes";
-import { supportedLocales, useTranslations } from "../../i18n/utils";
+import { getAllCurriculumEntries, supportedTracks } from "@/utils/routes";
+import { supportedLocales, useTranslations } from "@/i18n/utils";
 
 export const prerender = true;
 
@@ -48,18 +48,14 @@ export async function getStaticPaths() {
             },
             {
                 slug: `${locale}/tracks`,
-                title: t("sections.tracksTitle") || "Learning Tracks",
-                subtitle:
-                    t("sections.tracksSubtitle") ||
-                    "Master core computer science tracks.",
+                title: t("sections.tracksTitle"),
+                subtitle: t("sections.tracksSubtitle"),
                 badge: t("og.platformBadge"),
             },
             {
                 slug: `${locale}/about`,
-                title: t("sections.aboutTitle") || "About dijkstra_",
-                subtitle:
-                    t("sections.aboutSubtitle") ||
-                    "Computer science from first principles.",
+                title: t("sections.aboutTitle"),
+                subtitle: t("sections.aboutSubtitle"),
                 badge: t("og.platformBadge"),
             },
         ];

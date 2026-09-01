@@ -1,11 +1,11 @@
 ---
-import { useTranslations } from "../i18n/utils";
+import { useTranslations } from "@/i18n/utils";
 import { Font } from "astro:assets";
 
-import "../styles/reset.css";
-import "../styles/tokens.css";
-import "../styles/main.css";
-import Header from "../components/Header.astro";
+import "@/styles/reset.css";
+import "@/styles/tokens.css";
+import "@/styles/main.css";
+import Header from "@/components/Header.astro";
 
 interface Props {
     title: string;
@@ -114,9 +114,19 @@ const ogImageUrl = image || `${siteUrl}/og/${cleanSlug}.png`;
                             .matches
                             ? "dark"
                             : "light");
+                    const fontSize = data?.fontSize || "base";
+
                     document.documentElement.setAttribute("data-theme", theme);
+                    document.documentElement.setAttribute(
+                        "data-font-size",
+                        fontSize,
+                    );
                 } catch {
                     document.documentElement.setAttribute("data-theme", "dark");
+                    document.documentElement.setAttribute(
+                        "data-font-size",
+                        "base",
+                    );
                 }
             })();
         </script>

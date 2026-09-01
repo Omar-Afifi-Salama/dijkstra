@@ -1,0 +1,36 @@
+---
+# standard front matter attrs
+---
+
+import QuizCard from "@/components/QuizCard";
+
+# Understanding Python Collections
+
+Lists and dictionaries are fundamental data structures in Python...
+
+<QuizCard
+    client:load
+    title="Collections Checkpoint"
+    questions={[
+        {
+            question:
+                "Which of the following is an immutable collection in Python?",
+            choices: ["tuple", "list", "dict", "set"],
+            answer: "tuple",
+            explanation:
+                "Tuples cannot be modified after creation, unlike lists, sets, or dictionaries.",
+        },
+        {
+            question:
+                "What is the average time complexity to look up a key in a Python dictionary?",
+            choices: ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+            answer: "O(1)",
+            explanation:
+                "Python dictionaries use hash maps under the hood, yielding average O(1) lookups.",
+        },
+    ]}
+/>
+
+## Next Concepts
+
+Now let's explore list comprehensions...

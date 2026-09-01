@@ -5,6 +5,9 @@
         "home": "Home",
         "tracks": "Tracks",
         "about": "About",
+        "profile": "Profile",
+        "streak": "Days Streak",
+        "bookmarks": "Bookmarks",
 
         "backTo": "Back to",
         "backToDashboard": "Back to Dashboard",
@@ -165,5 +168,44 @@
         "downloading": "Downloading...",
         "removing": "Removing...",
         "failed": "Download Failed"
+    },
+    "actions": {
+        "markComplete": "Mark as Completed",
+        "completed": "Completed",
+        "bookmark": "Bookmark",
+        "bookmarked": "Bookmarked"
+    },
+    "user": {
+        "pageTitle": "Learner Profile",
+        "pageDescription": "Review your current progress, streaks, and bookmarks.",
+        "heading": "Learner Profile",
+        "subheading": "Your independent, local-first progress record.",
+        "streakTitle": "Daily Streak",
+        "streakDays": "days",
+        "longestStreak": "Longest streak",
+        "completedTitle": "Completed",
+        "completedSubtitle": "Lessons & challenges solved",
+        "bookmarksTitle": "Bookmarks",
+        "bookmarksSubtitle": "Items saved for review",
+        "noBookmarks": "No bookmarks saved yet. Click the bookmark icon on any lesson or challenge to save it here.",
+        "removeBookmark": "Remove bookmark",
+        "resetTitle": "Reset Progress",
+        "resetDescription": "Permanently clears all local completion records and streaks.",
+        "resetButton": "Reset Local Data",
+        "resetConfirm": "Are you sure? This action cannot be undone."
+    },
+    "quiz": {
+        "defaultTitle": "Knowledge Check",
+        "question": "Question",
+        "questions": "Questions",
+        "back": "Back",
+        "next": "Next",
+        "checkAnswers": "Check Answers",
+        "resetRetry": "Reset & Retry",
+        "score": "Score",
+        "correct": "Correct",
+        "wrong": "Wrong",
+        "explanation": "Explanation",
+        "incompleteAlert": "Please answer all questions before submitting."
     }
 }

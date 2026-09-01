@@ -1,0 +1,135 @@
+---
+// src/pages/[locale]/user/index.astro
+import GlobalLayout from "../../../layouts/GlobalLayout.astro";
+import UserDashboard from "../../../components/user/UserDashboard";
+import { useTranslations, supportedLocales } from "../../../i18n/utils";
+import { getCollection } from "astro:content";
+import { createItemKey } from "../../../stores/userStore";
+
+export function getStaticPaths() {
+    return supportedLocales.map((locale) => ({
+        params: { locale },
+    }));
+}
+
+const { locale } = Astro.params;
+const { t } = useTranslations(locale);
+
+// Fetch collections and build an item lookup map for this locale
+const [lessons, challenges, projects] = await Promise.all([
+    getCollection("lessons", ({ id }: any) => id.startsWith(`${locale}/`)),
+    getCollection("challenges", ({ id }: any) => id.startsWith(`${locale}/`)),
+    getCollection("projects", ({ id }: any) => id.startsWith(`${locale}/`)),
+]);
+
+interface ContentSummary {
+    title: string;
+    description: string;
+    track: string;
+    type: string;
+    slug: string;
+}
+
+const contentCatalog: Record<string, ContentSummary> = {};
+
+function processEntries(entries: any[], type: string) {
+    for (const entry of entries) {
+        // id format: "en/python/lessons/01-intro.md"
+        const cleanId = entry.id.replace(/\.(md|mdx)$/, "");
+        const parts = cleanId.split("/");
+        const track = parts[1];
+        const slug = parts.slice(3).join("/");
+
+        const canonicalKey = createItemKey(track, type, slug);
+        contentCatalog[canonicalKey] = {
+            title: entry.data.title,
+            description: entry.data.description,
+            track,
+            type,
+            slug,
+        };
+    }
+}
+
+processEntries(lessons, "lessons");
+processEntries(challenges, "challenges");
+processEntries(projects, "projects");
+
+const dashboardTranslations = {
+    streakTitle: t("user.streakTitle"),
+    streakDays: t("user.streakDays"),
+    longestStreak: t("user.longestStreak"),
+    completedTitle: t("user.completedTitle"),
+    completedSubtitle: t("user.completedSubtitle"),
+    bookmarksTitle: t("user.bookmarksTitle"),
+    bookmarksSubtitle: t("user.bookmarksSubtitle") || "Items saved for review",
+    noBookmarks:
+        t("user.noBookmarks") ||
+        "No bookmarks saved yet. Click the bookmark icon on any lesson to save it here.",
+    removeBookmark: t("user.removeBookmark") || "Remove bookmark",
+    resetTitle: t("user.resetTitle") || "Reset Progress",
+    resetDescription:
+        t("user.resetDescription") ||
+        "Permanently clears all local completion records and streaks.",
+    resetButton: t("user.resetButton") || "Reset Local Data",
+    resetConfirm:
+        t("user.resetConfirm") || "Are you sure? This action cannot be undone.",
+};
+---
+
+<GlobalLayout
+    title={t("user.pageTitle") || "Learner Profile"}
+    description={t("user.pageDescription") ||
+        "Review your current progress, streaks, and bookmarks."}
+    locale={locale}
+>
+    <main class="page-container">
+        <header class="page-header">
+            <h1 class="page-title">{t("user.heading") || "Learner Profile"}</h1>
+            <p class="page-subtitle">
+                {
+                    t("user.subheading") ||
+                        "Your independent, local-first progress record."
+                }
+            </p>
+        </header>
+
+        <UserDashboard
+            client:only="react"
+            locale={locale}
+            catalog={contentCatalog}
+            translations={dashboardTranslations}
+        />
+    </main>
+</GlobalLayout>
+
+<style>
+    .page-container {
+        max-width: var(--max-w-layout, 1100px);
+        margin-inline: auto;
+        padding-inline: var(--space-4, 1rem);
+        padding-block: var(--space-8, 2rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6, 1.5rem);
+    }
+
+    .page-header {
+        border-block-end: 1px solid var(--border-subtle);
+        padding-block-end: var(--space-4, 1rem);
+    }
+
+    .page-title {
+        font-size: var(--text-2xl, 1.5rem);
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .page-subtitle {
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-secondary);
+        margin-block-start: var(--space-1, 0.25rem);
+        margin-block-end: 0;
+    }
+</style>

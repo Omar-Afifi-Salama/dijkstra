@@ -1,5 +1,5 @@
 import { getCollection, type CollectionEntry } from "astro:content";
-import { roadmaps, type Track } from "../data/roadmaps";
+import { roadmaps, type Track } from "@/data/roadmaps";
 
 export interface RoadmapStep {
     stepNumber: number;
