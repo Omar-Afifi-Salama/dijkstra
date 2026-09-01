@@ -2,8 +2,11 @@ backend:
     name: github
     repo: Omar-Afifi-Salama/dijkstra
     branch: main
-    base_url: https://dijkstra-coding.vercel.app
-    auth_endpoint: api/auth
+    auth_type: pkce
+    app_id: "Iv1. Ov23liq3Cg46TEVSFh2g"
+
+# Set to true only when running `npx decap-server` locally
+local_backend: false
 
 publish_mode: editorial_workflow
 
