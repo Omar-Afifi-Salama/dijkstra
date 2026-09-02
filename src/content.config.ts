@@ -5,6 +5,7 @@ import { glob } from "astro/loaders";
 const baseSchema = z.object({
     title: z.string().min(1).max(80),
     description: z.string().min(1).max(160),
+    slug: z.string().min(1),
 
     order: z.number().int().positive(),
 
